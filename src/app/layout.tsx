@@ -42,6 +42,8 @@ export default function RootLayout({
                   } else {
                     document.documentElement.setAttribute('data-theme', 'light');
                   }
+                  const storedColor = localStorage.getItem('theme-color') || 'orange';
+                  document.documentElement.setAttribute('data-color', storedColor);
                 } catch (e) {}
               })();
             `,

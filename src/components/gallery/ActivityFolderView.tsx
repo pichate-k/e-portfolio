@@ -20,6 +20,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Language } from "@/lib/i18n";
+import { ThemeColorPicker } from "../ThemeColorPicker";
 import { DriveImageFile } from "@/lib/googleDrive";
 import { GalleryActivityItem } from "./GalleryLanding";
 import styles from "./ActivityFolderView.module.css";
@@ -179,6 +180,8 @@ export const ActivityFolderView: React.FC<ActivityFolderViewProps> = ({
                 TH
               </button>
             </div>
+
+            <ThemeColorPicker lang={lang} />
           </div>
         </div>
 

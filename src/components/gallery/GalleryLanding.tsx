@@ -14,6 +14,7 @@ import {
   FolderOpen,
 } from "lucide-react";
 import { Language } from "@/lib/i18n";
+import { ThemeColorPicker } from "../ThemeColorPicker";
 import styles from "./GalleryLanding.module.css";
 
 export interface GalleryActivityItem {
@@ -103,21 +104,24 @@ export const GalleryLanding: React.FC<GalleryLandingProps> = ({
             <span>{isTh ? "กลับหน้าหลัก Portfolio" : "Back to Portfolio"}</span>
           </Link>
 
-          <div className={styles.langToggle}>
-            <button
-              type="button"
-              onClick={() => setLang("en")}
-              className={`${styles.langBtn} ${lang === "en" ? styles.langBtnActive : ""}`}
-            >
-              EN
-            </button>
-            <button
-              type="button"
-              onClick={() => setLang("th")}
-              className={`${styles.langBtn} ${lang === "th" ? styles.langBtnActive : ""}`}
-            >
-              TH
-            </button>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem" }}>
+            <div className={styles.langToggle}>
+              <button
+                type="button"
+                onClick={() => setLang("en")}
+                className={`${styles.langBtn} ${lang === "en" ? styles.langBtnActive : ""}`}
+              >
+                EN
+              </button>
+              <button
+                type="button"
+                onClick={() => setLang("th")}
+                className={`${styles.langBtn} ${lang === "th" ? styles.langBtnActive : ""}`}
+              >
+                TH
+              </button>
+            </div>
+            <ThemeColorPicker lang={lang} />
           </div>
         </div>
 

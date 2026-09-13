@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Download, Sun, Moon, ShieldCheck, User } from "lucide-react";
 import { Language, translations } from "@/lib/i18n";
+import { ThemeColorPicker } from "./ThemeColorPicker";
 import styles from "./Navbar.module.css";
 
 interface NavbarProps {
@@ -122,6 +123,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
             </button>
           )}
+
+          <ThemeColorPicker lang={lang} />
 
           <button
             onClick={onOpenDownloadModal}

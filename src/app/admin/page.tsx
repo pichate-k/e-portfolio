@@ -41,6 +41,7 @@ import { ExportSettingsPanel } from "@/components/admin/ExportSettingsPanel";
 import { PersonalInfoManager } from "@/components/admin/PersonalInfoManager";
 import { GalleryManager } from "@/components/admin/GalleryManager";
 import { BackupMigrationPanel } from "@/components/admin/BackupMigrationPanel";
+import { ThemeColorPicker } from "@/components/ThemeColorPicker";
 import {
   YearPickerInput,
   YearRangePickerInput,
@@ -1267,6 +1268,7 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className={styles.topActions}>
+          <ThemeColorPicker align="right" />
           <Link href="/" target="_blank" className={styles.topBtn}>
             <span>View Public Site</span>
             <ExternalLink size={14} />
