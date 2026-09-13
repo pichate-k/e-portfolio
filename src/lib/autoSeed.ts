@@ -1,6 +1,11 @@
 import { prisma } from "./prisma";
 import { hashPassword } from "./auth";
 
+// Automatic support for Vercel Postgres (Storage Tab)
+if (!process.env.DATABASE_URL && (process.env.POSTGRES_PRISMA_URL || process.env.POSTGRES_URL)) {
+  process.env.DATABASE_URL = process.env.POSTGRES_PRISMA_URL || process.env.POSTGRES_URL;
+}
+
 let tablesEnsured = false;
 
 export async function ensureTablesExist() {
