@@ -49,10 +49,7 @@ export const Footer: React.FC<FooterProps> = ({
           <p style={{ fontWeight: 600, color: "var(--text-primary)" }}>{name}</p>
           <p style={{ fontSize: "0.85rem", marginTop: "0.2rem" }}>{place}</p>
           <p style={{ fontSize: "0.8rem", marginTop: "0.5rem" }}>
-            © {new Date().getFullYear()} {t.rightsReserved}
-          </p>
-          <p style={{ fontSize: "0.8rem", marginTop: "0.35rem", color: "var(--text-muted)" }}>
-            This site created by kunatechnology Co.,LTD.
+            © {new Date().getFullYear()} All rights reserved by Kunatechnology Co.,LTD
           </p>
         </div>
 

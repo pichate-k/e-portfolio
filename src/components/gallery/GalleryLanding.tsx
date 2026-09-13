@@ -283,9 +283,8 @@ export const GalleryLanding: React.FC<GalleryLandingProps> = ({
             color: "var(--muted-foreground)",
           }}
         >
-          <p>© {new Date().getFullYear()} All rights reserved.</p>
-          <p style={{ fontSize: "0.8rem", marginTop: "0.25rem", opacity: 0.85 }}>
-            This site created by kunatechnology Co.,LTD.
+          <p style={{ fontSize: "0.8rem", opacity: 0.9 }}>
+            © {new Date().getFullYear()} All rights reserved by Kunatechnology Co.,LTD
           </p>
         </footer>
       </div>
