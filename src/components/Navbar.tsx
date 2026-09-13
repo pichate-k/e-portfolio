@@ -18,9 +18,9 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
-  fullName = "Dr. Pichate K.",
+  fullName = "User Name",
   fullNameTh,
-  currentPosition = "Assistant Professor",
+  currentPosition = "Portfolio",
   currentPositionTh,
   lang,
   onToggleLang,

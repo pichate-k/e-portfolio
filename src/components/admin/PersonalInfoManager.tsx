@@ -142,12 +142,12 @@ export const PersonalInfoManager: React.FC<PersonalInfoManagerProps> = ({ onNoti
       title: `Profile ${newIndex} (${defaultTemplate.name.split(" ")[0]})`,
       template: defaultTemplate.id,
       isDefault: profiles.length === 0,
-      fullName: base?.fullName || "Dr. Pichate K.",
-      fullNameTh: base?.fullNameTh || "ดร. พิเชษฐ์ เค.",
+      fullName: base?.fullName || "User Name",
+      fullNameTh: base?.fullNameTh || "ผู้ใช้งานระบบ",
       position: "Senior Researcher & Consultant",
       positionTh: "นักวิจัยอาวุโส และที่ปรึกษา",
-      organization: base?.organization || "Rajamangala University of Technology Thanyaburi",
-      organizationTh: base?.organizationTh || "มหาวิทยาลัยเทคโนโลยีราชมงคลธัญบุรี",
+      organization: base?.organization || "University / Organization",
+      organizationTh: base?.organizationTh || "มหาวิทยาลัย / องค์กร",
       department: base?.department || "Faculty of Engineering",
       departmentTh: base?.departmentTh || "คณะวิศวกรรมศาสตร์",
       email: base?.email || "",
@@ -551,7 +551,7 @@ export const PersonalInfoManager: React.FC<PersonalInfoManagerProps> = ({ onNoti
                     setActiveProfile({ ...activeProfile, fullName: e.target.value })
                   }
                   className={styles.input}
-                  placeholder="e.g. Dr. Pichate K."
+                  placeholder="e.g. Dr. Jane Doe หรือ ดร. สมชาย ใจดี"
                 />
               </div>
 
@@ -733,7 +733,7 @@ export const PersonalInfoManager: React.FC<PersonalInfoManagerProps> = ({ onNoti
                     setActiveProfile({ ...activeProfile, email: e.target.value })
                   }
                   className={styles.input}
-                  placeholder="pichate.k@rmutt.ac.th"
+                  placeholder="user@example.com"
                 />
               </div>
 
@@ -746,7 +746,7 @@ export const PersonalInfoManager: React.FC<PersonalInfoManagerProps> = ({ onNoti
                     setActiveProfile({ ...activeProfile, phone: e.target.value })
                   }
                   className={styles.input}
-                  placeholder="+66 (0) 2-549-3400"
+                  placeholder="+66 (0) 2-000-0000"
                 />
               </div>
 
@@ -759,7 +759,7 @@ export const PersonalInfoManager: React.FC<PersonalInfoManagerProps> = ({ onNoti
                     setActiveProfile({ ...activeProfile, websiteUrl: e.target.value })
                   }
                   className={styles.input}
-                  placeholder="https://pichatek.com"
+                  placeholder="https://example.com"
                 />
               </div>
 
@@ -772,7 +772,7 @@ export const PersonalInfoManager: React.FC<PersonalInfoManagerProps> = ({ onNoti
                     setActiveProfile({ ...activeProfile, linkedinUrl: e.target.value })
                   }
                   className={styles.input}
-                  placeholder="https://linkedin.com/in/pichatek"
+                  placeholder="https://linkedin.com/in/username"
                 />
               </div>
 
@@ -785,7 +785,7 @@ export const PersonalInfoManager: React.FC<PersonalInfoManagerProps> = ({ onNoti
                     setActiveProfile({ ...activeProfile, githubUrl: e.target.value })
                   }
                   className={styles.input}
-                  placeholder="https://github.com/pichatek"
+                  placeholder="https://github.com/username"
                 />
               </div>
 
@@ -811,7 +811,7 @@ export const PersonalInfoManager: React.FC<PersonalInfoManagerProps> = ({ onNoti
                     setActiveProfile({ ...activeProfile, lineId: e.target.value })
                   }
                   className={styles.input}
-                  placeholder="e.g. pichate_k หรือ https://line.me/ti/p/~..."
+                  placeholder="e.g. your_line_id หรือ https://line.me/ti/p/~..."
                 />
               </div>
 

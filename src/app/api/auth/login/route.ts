@@ -17,7 +17,18 @@ export async function POST(req: Request) {
     const cleanEmail = email.toLowerCase().trim();
     let user = null;
 
+    let userCount = 0;
     try {
+      userCount = await prisma.user.count();
+      if (userCount === 0) {
+        return NextResponse.json(
+          {
+            error: "ยังไม่มีบัญชีผู้ดูแลระบบในระบบ กรุณาคลิกเพื่อทำการตั้งค่าบัญชีในครั้งแรก",
+            needsSetup: true,
+          },
+          { status: 400 }
+        );
+      }
       user = await prisma.user.findUnique({
         where: { email: cleanEmail },
       });
@@ -29,25 +40,11 @@ export async function POST(req: Request) {
 
     if (user) {
       isMatch = await verifyPassword(password, user.passwordHash);
-    } else if (
-      (cleanEmail === "pichate_k@rmutt.ac.th" && password === "password@pk") ||
-      (cleanEmail === "admin@pichatek.com" && password === "admin123456")
-    ) {
-      // Auto-provision and auto-seed on first login with admin credentials
-      isMatch = true;
-      try {
-        await ensureDefaultAdminAndData();
-        user = await prisma.user.findUnique({
-          where: { email: cleanEmail },
-        });
-      } catch (seedErr) {
-        console.warn("Could not auto-seed database during login:", seedErr);
-      }
     }
 
     if (!isMatch) {
       return NextResponse.json(
-        { error: "Invalid email or password" },
+        { error: "อีเมลหรือรหัสผ่านไม่ถูกต้อง กรุณาลองใหม่อีกครั้ง" },
         { status: 401 }
       );
     }
@@ -55,7 +52,7 @@ export async function POST(req: Request) {
     const sessionPayload = {
       userId: user?.id || "default-admin-id",
       email: user?.email || cleanEmail,
-      name: user?.name || "Dr. Pichate K.",
+      name: user?.name || "User Portfolio",
       role: user?.role || "ADMIN",
     };
 

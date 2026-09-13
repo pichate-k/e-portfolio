@@ -55,8 +55,8 @@ export const ECardClient: React.FC<ECardClientProps> = ({
             title: "Academic & Research Card",
             template: "academic",
             isDefault: true,
-            fullName: profile.fullName || "Dr. Pichate K.",
-            fullNameTh: profile.fullNameTh || "ดร. พิเชษฐ์ เค.",
+            fullName: profile.fullName || "User Name",
+            fullNameTh: profile.fullNameTh || "ผู้ใช้งานระบบ",
             position: profile.currentPosition || "Researcher",
             positionTh: profile.currentPositionTh || "นักวิจัย",
             organization: profile.workplace || "Faculty of Engineering",
@@ -69,9 +69,9 @@ export const ECardClient: React.FC<ECardClientProps> = ({
             avatarUrl: profile.avatarUrl || null,
             linkedinUrl: profile.linkedinUrl || null,
             githubUrl: profile.githubUrl || null,
-            backTagline: "Innovating AI & Embedded Systems",
-            backTaglineTh: "สร้างสรรค์นวัตกรรม AI และระบบสมองกลฝังตัว",
-            backSubtitle: "Research • Academic • Consulting",
+            backTagline: "Innovating Intelligent Systems",
+            backTaglineTh: "สร้างสรรค์นวัตกรรมระบบอัจฉริยะ",
+            backSubtitle: "Research • Academic • Development",
             qrType: "card_url",
           },
         ]
@@ -88,7 +88,7 @@ export const ECardClient: React.FC<ECardClientProps> = ({
       slug: "default",
       title: "Digital E-Card",
       template: "executive",
-      fullName: "Dr. Pichate K.",
+      fullName: "User Name",
       position: "Researcher",
     } as NamecardData);
 

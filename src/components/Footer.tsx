@@ -14,9 +14,9 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({
-  fullName = "Pichate K.",
+  fullName = "User Name",
   fullNameTh,
-  workplace = "Rajamangala University of Technology Thanyaburi",
+  workplace = "University / Organization",
   workplaceTh,
   lang,
 }) => {

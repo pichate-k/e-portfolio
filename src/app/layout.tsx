@@ -7,20 +7,18 @@ export const viewport = {
 };
 
 export const metadata: Metadata = {
-  title: "Dr. Pichate K. | Academic & Professional Portfolio",
+  title: "Academic & Professional Portfolio",
   description:
-    "Personal site and CV of Dr. Pichate K. - Assistant Professor, AI & Embedded Systems Researcher at Rajamangala University of Technology Thanyaburi.",
+    "Personal site and CV management system - Academic & Professional Portfolio.",
   keywords: [
-    "Pichate K",
     "CV",
     "Portfolio",
-    "Assistant Professor",
-    "AI Researcher",
-    "Embedded Systems",
-    "RMUTT",
+    "Academic",
+    "Researcher",
+    "Software Engineer",
     "Thailand",
   ],
-  authors: [{ name: "Dr. Pichate K." }],
+  authors: [{ name: "User Portfolio" }],
 };
 
 export default function RootLayout({

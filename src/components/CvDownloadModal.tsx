@@ -66,7 +66,7 @@ export const CvDownloadModal: React.FC<CvDownloadModalProps> = ({
       // Download file blob
       const blob = await response.blob();
       const filenameHeader = response.headers.get("Content-Disposition");
-      let filename = `Pichate_K_CV_${docLang.toUpperCase()}.${format}`;
+      let filename = `Portfolio_CV_${docLang.toUpperCase()}.${format}`;
       if (filenameHeader && filenameHeader.includes("filename=")) {
         const match = filenameHeader.match(/filename="?([^"]+)"?/);
         if (match && match[1]) filename = decodeURIComponent(match[1]);

@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
       if (profile) {
         const existingProfile = await tx.profile.findFirst();
         const profileData = {
-          fullName: profile.fullName || "Dr. Pichate K.",
+          fullName: profile.fullName || "User Name",
           fullNameTh: profile.fullNameTh || null,
           currentPosition: profile.currentPosition || "Researcher",
           currentPositionTh: profile.currentPositionTh || null,
@@ -52,7 +52,7 @@ export async function POST(req: NextRequest) {
           workplaceTh: profile.workplaceTh || null,
           address: profile.address || "",
           addressTh: profile.addressTh || null,
-          email: profile.email || "pichate.k@rmutt.ac.th",
+          email: profile.email || "user@example.com",
           phone: profile.phone || null,
           websiteUrl: profile.websiteUrl || null,
           linkedinUrl: profile.linkedinUrl || null,
@@ -236,7 +236,7 @@ export async function POST(req: NextRequest) {
             title: nc.title,
             template: nc.template || "executive",
             isDefault: Boolean(nc.isDefault),
-            fullName: nc.fullName || "Dr. Pichate K.",
+            fullName: nc.fullName || "User Name",
             fullNameTh: nc.fullNameTh || null,
             position: nc.position || "Researcher",
             positionTh: nc.positionTh || null,

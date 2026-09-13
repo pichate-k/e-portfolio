@@ -1,4 +1,4 @@
-// Prisma schema file for PichateK-site
+// Prisma schema file for Portfolio & CV Management System
 // Supports PostgreSQL on local and Vercel cloud (Neon, Supabase, etc.)
 
 generator client {
@@ -22,8 +22,8 @@ model User {
 
 model SiteSetting {
   id                   String   @id @default(cuid())
-  siteTitle            String   @default("Pichate K. | Academic & Professional Portfolio")
-  bioTagline           String?  @default("Researcher, Educator & Professional Engineer")
+  siteTitle            String   @default("Academic & Professional Portfolio")
+  bioTagline           String?  @default("Researcher, Educator & Software Engineer")
   downloadPasswordHash String   // Hashed download password
   requireCvPassword    Boolean  @default(true)
   themePreference      String   @default("system")
@@ -34,16 +34,16 @@ model SiteSetting {
 
 model Profile {
   id                String   @id @default(cuid())
-  fullName          String   @default("Dr. Pichate K.")
-  fullNameTh        String?  @default("ดร. พิเชษฐ์ เค.")
-  currentPosition   String   @default("Assistant Professor & Lead AI Researcher")
-  currentPositionTh String?  @default("ผู้ช่วยศาสตราจารย์ และหัวหน้าทีมนักวิจัย AI")
-  workplace         String   @default("Faculty of Engineering, Rajamangala University of Technology Thanyaburi")
-  workplaceTh       String?  @default("คณะวิศวกรรมศาสตร์ มหาวิทยาลัยเทคโนโลยีราชมงคลธัญบุรี")
-  address           String   @default("Pathum Thani, Thailand")
-  addressTh         String?  @default("จ.ปทุมธานี ประเทศไทย")
-  email             String   @default("pichate.k@rmutt.ac.th")
-  phone             String?  @default("+66 (0) 2-549-3400")
+  fullName          String   @default("User Name")
+  fullNameTh        String?  @default("ผู้ใช้งานระบบ")
+  currentPosition   String   @default("Researcher & Software Engineer")
+  currentPositionTh String?  @default("นักวิจัยและวิศวกรซอฟต์แวร์")
+  workplace         String   @default("Faculty of Engineering, University")
+  workplaceTh       String?  @default("คณะวิศวกรรมศาสตร์ มหาวิทยาลัย")
+  address           String   @default("Bangkok, Thailand")
+  addressTh         String?  @default("กรุงเทพมหานคร ประเทศไทย")
+  email             String   @default("user@example.com")
+  phone             String?  @default("+66 (0) 2-000-0000")
   websiteUrl        String?
   linkedinUrl       String?
   githubUrl         String?

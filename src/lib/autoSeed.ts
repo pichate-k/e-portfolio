@@ -21,8 +21,8 @@ export async function ensureTablesExist() {
     // 2. SiteSetting table
     `CREATE TABLE IF NOT EXISTS "SiteSetting" (
       "id" TEXT PRIMARY KEY,
-      "siteTitle" TEXT NOT NULL DEFAULT 'Dr. Pichate K. | Academic & Professional Portfolio',
-      "bioTagline" TEXT DEFAULT 'Assistant Professor, AI Researcher & Engineering Educator',
+      "siteTitle" TEXT NOT NULL DEFAULT 'Academic & Professional Portfolio',
+      "bioTagline" TEXT DEFAULT 'Researcher, Educator & Software Engineer',
       "downloadPasswordHash" TEXT NOT NULL,
       "requireCvPassword" BOOLEAN NOT NULL DEFAULT true,
       "themePreference" TEXT NOT NULL DEFAULT 'system',
@@ -32,16 +32,16 @@ export async function ensureTablesExist() {
     // 3. Profile table
     `CREATE TABLE IF NOT EXISTS "Profile" (
       "id" TEXT PRIMARY KEY,
-      "fullName" TEXT NOT NULL DEFAULT 'Dr. Pichate K.',
-      "fullNameTh" TEXT DEFAULT 'ดร. พิเชษฐ์ เค.',
-      "currentPosition" TEXT NOT NULL DEFAULT 'Assistant Professor & Lead AI Researcher',
-      "currentPositionTh" TEXT DEFAULT 'ผู้ช่วยศาสตราจารย์ และหัวหน้าทีมนักวิจัย AI',
-      "workplace" TEXT NOT NULL DEFAULT 'Faculty of Engineering, Rajamangala University of Technology Thanyaburi',
-      "workplaceTh" TEXT DEFAULT 'คณะวิศวกรรมศาสตร์ มหาวิทยาลัยเทคโนโลยีราชมงคลธัญบุรี',
-      "address" TEXT NOT NULL DEFAULT 'Pathum Thani, Thailand',
-      "addressTh" TEXT DEFAULT 'จ.ปทุมธานี ประเทศไทย',
-      "email" TEXT NOT NULL DEFAULT 'pichate.k@rmutt.ac.th',
-      "phone" TEXT DEFAULT '+66 (0) 2-549-3400',
+      "fullName" TEXT NOT NULL DEFAULT 'User Name',
+      "fullNameTh" TEXT DEFAULT 'ผู้ใช้งานระบบ',
+      "currentPosition" TEXT NOT NULL DEFAULT 'Researcher & Software Engineer',
+      "currentPositionTh" TEXT DEFAULT 'นักวิจัยและวิศวกรซอฟต์แวร์',
+      "workplace" TEXT NOT NULL DEFAULT 'Faculty of Engineering, University',
+      "workplaceTh" TEXT DEFAULT 'คณะวิศวกรรมศาสตร์ มหาวิทยาลัย',
+      "address" TEXT NOT NULL DEFAULT 'Bangkok, Thailand',
+      "addressTh" TEXT DEFAULT 'กรุงเทพมหานคร ประเทศไทย',
+      "email" TEXT NOT NULL DEFAULT 'user@example.com',
+      "phone" TEXT DEFAULT '+66 (0) 2-000-0000',
       "websiteUrl" TEXT,
       "linkedinUrl" TEXT,
       "githubUrl" TEXT,
@@ -207,39 +207,33 @@ export async function ensureTablesExist() {
   tablesEnsured = true;
 }
 
+export async function checkAdminExists(): Promise<boolean> {
+  if (!process.env.DATABASE_URL) return false;
+  try {
+    await ensureTablesExist();
+    const count = await prisma.user.count({
+      where: { role: "ADMIN" },
+    });
+    return count > 0;
+  } catch (e) {
+    console.warn("Error checking admin existence:", e);
+    return false;
+  }
+}
+
 export async function ensureDefaultAdminAndData() {
   if (!process.env.DATABASE_URL) return;
   try {
     await ensureTablesExist();
 
-    // 1. Ensure Primary Admin User (pichate_k@rmutt.ac.th / password@pk)
-    const primaryEmail = "pichate_k@rmutt.ac.th";
-    const primaryPass = "password@pk";
-    const existingAdmin = await prisma.user.findFirst({
-      where: { email: primaryEmail },
-    });
-
-    if (!existingAdmin) {
-      const passwordHash = await hashPassword(primaryPass);
-      await prisma.user.create({
-        data: {
-          email: primaryEmail,
-          name: "Dr. Pichate K.",
-          passwordHash,
-          role: "ADMIN",
-        },
-      });
-      console.log("Auto-seeded primary admin user: " + primaryEmail);
-    }
-
     // 2. Ensure Site Settings
     const existingSetting = await prisma.siteSetting.findFirst();
     if (!existingSetting) {
-      const downloadPasswordHash = await hashPassword("pichate2025");
+      const downloadPasswordHash = await hashPassword("download123");
       await prisma.siteSetting.create({
         data: {
-          siteTitle: "Dr. Pichate K. | Academic & Professional Portfolio",
-          bioTagline: "Assistant Professor, AI Researcher & Engineering Educator",
+          siteTitle: "Academic & Professional Portfolio",
+          bioTagline: "Researcher, Educator & Software Engineer",
           downloadPasswordHash,
           requireCvPassword: true,
           themePreference: "system",
@@ -252,22 +246,22 @@ export async function ensureDefaultAdminAndData() {
     if (!existingProfile) {
       await prisma.profile.create({
         data: {
-          fullName: "Dr. Pichate K.",
-          fullNameTh: "ดร. พิเชษฐ์ เค.",
-          currentPosition: "Assistant Professor & Lead AI Researcher",
-          currentPositionTh: "ผู้ช่วยศาสตราจารย์ และหัวหน้าทีมนักวิจัย AI",
-          workplace: "Faculty of Engineering, Rajamangala University of Technology Thanyaburi",
-          workplaceTh: "คณะวิศวกรรมศาสตร์ มหาวิทยาลัยเทคโนโลยีราชมงคลธัญบุรี",
-          address: "39 Moo 1, Klong 6, Khlong Luang, Pathum Thani 12110, Thailand",
-          addressTh: "39 หมู่ 1 ต.คลองหก อ.คลองหลวง จ.ปทุมธานี 12110 ประเทศไทย",
-          email: "pichate.k@rmutt.ac.th",
-          phone: "+66 (0) 2-549-3400",
-          websiteUrl: "https://pichatek.com",
-          linkedinUrl: "https://linkedin.com/in/pichatek",
-          githubUrl: "https://github.com/pichatek",
+          fullName: "User Name",
+          fullNameTh: "ผู้ใช้งานระบบ",
+          currentPosition: "Researcher & Software Engineer",
+          currentPositionTh: "นักวิจัยและวิศวกรซอฟต์แวร์",
+          workplace: "Faculty of Engineering, University",
+          workplaceTh: "คณะวิศวกรรมศาสตร์ มหาวิทยาลัย",
+          address: "Bangkok, Thailand",
+          addressTh: "กรุงเทพมหานคร ประเทศไทย",
+          email: "user@example.com",
+          phone: "+66 (0) 2-000-0000",
+          websiteUrl: "https://example.com",
+          linkedinUrl: "https://linkedin.com",
+          githubUrl: "https://github.com",
           avatarUrl: "",
-          bio: "Academic researcher and engineering educator specializing in Machine Learning, Intelligent Systems, and IoT Automation. Dedicated to bridging cutting-edge scientific innovation with high-impact real-world engineering solutions.",
-          bioTh: "นักวิจัยและอาจารย์ผู้เชี่ยวชาญด้านระบบการเรียนรู้ของเครื่อง (Machine Learning) ระบบอัจฉริยะ และระบบอัตโนมัติ IoT มุ่งเน้นการเชื่อมโยงนวัตกรรมทางวิทยาการคอมพิวเตอร์ชั้นนำเข้ากับงานวิศวกรรมที่สร้างผลกระทบเชิงบวกต่อสังคมและอุตสาหกรรมจริง",
+          bio: "Academic researcher and software engineer dedicated to scientific innovation and high-impact engineering solutions.",
+          bioTh: "นักวิจัยและวิศวกรซอฟต์แวร์ มุ่งเน้นการพัฒนานวัตกรรมทางวิทยาการคอมพิวเตอร์และงานวิศวกรรมที่สร้างผลกระทบเชิงบวก",
         },
       });
     }

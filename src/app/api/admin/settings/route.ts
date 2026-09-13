@@ -12,8 +12,8 @@ export async function GET(req: NextRequest) {
 
   if (!process.env.DATABASE_URL) {
     return NextResponse.json({
-      siteTitle: "Dr. Pichate K. Portfolio",
-      bioTagline: "Assistant Professor & AI Researcher",
+      siteTitle: "Academic & Professional Portfolio",
+      bioTagline: "Researcher, Educator & Software Engineer",
       requireCvPassword: true,
       hasCvPassword: true,
       googleDrive: {
@@ -51,7 +51,7 @@ export async function GET(req: NextRequest) {
   }
 
   return NextResponse.json({
-    siteTitle: setting?.siteTitle || "Dr. Pichate K. Portfolio",
+    siteTitle: setting?.siteTitle || "Academic & Professional Portfolio",
     bioTagline: setting?.bioTagline || "",
     requireCvPassword: setting?.requireCvPassword ?? true,
     hasCvPassword: Boolean(setting?.downloadPasswordHash),
@@ -155,10 +155,10 @@ export async function PUT(req: NextRequest) {
         data: updateData,
       });
     } else {
-      const defaultHash = await hashPassword("pichate2025");
+      const defaultHash = await hashPassword("download123");
       await prisma.siteSetting.create({
         data: {
-          siteTitle: siteTitle || "Dr. Pichate K. Portfolio",
+          siteTitle: siteTitle || "Academic & Professional Portfolio",
           bioTagline: bioTagline || "",
           requireCvPassword: requireCvPassword !== undefined ? Boolean(requireCvPassword) : true,
           downloadPasswordHash: updateData.downloadPasswordHash || defaultHash,

@@ -4,10 +4,10 @@ import { cookies } from "next/headers";
 import { NextRequest } from "next/server";
 
 const SECRET_KEY = new TextEncoder().encode(
-  process.env.JWT_SECRET || "pichate_k_portfolio_secure_jwt_secret_key_2025_vercel"
+  process.env.JWT_SECRET || "portfolio_secure_jwt_secret_key_2025_vercel"
 );
 
-export const AUTH_COOKIE_NAME = "pichatek_admin_session";
+export const AUTH_COOKIE_NAME = "portfolio_admin_session";
 
 export async function hashPassword(password: string): Promise<string> {
   const salt = await bcrypt.genSalt(10);

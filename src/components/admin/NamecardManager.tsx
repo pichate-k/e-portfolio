@@ -70,19 +70,19 @@ export const NamecardManager: React.FC<NamecardManagerProps> = ({ onNotify }) =>
       title: `Digital Card ${cards.length + 1}`,
       template: defaultTemplate.id,
       isDefault: cards.length === 0,
-      fullName: cards[0]?.fullName || "Dr. Pichate K.",
-      fullNameTh: cards[0]?.fullNameTh || "ดร. พิเชษฐ์ เค.",
+      fullName: cards[0]?.fullName || "User Name",
+      fullNameTh: cards[0]?.fullNameTh || "ผู้ใช้งานระบบ",
       position: cards[0]?.position || "Assistant Professor & AI Researcher",
       positionTh: cards[0]?.positionTh || "ผู้ช่วยศาสตราจารย์ และนักวิจัย AI",
-      organization: cards[0]?.organization || "Rajamangala University of Technology Thanyaburi",
-      organizationTh: cards[0]?.organizationTh || "มหาวิทยาลัยเทคโนโลยีราชมงคลธัญบุรี",
+      organization: cards[0]?.organization || "University / Organization",
+      organizationTh: cards[0]?.organizationTh || "มหาวิทยาลัย / องค์กร",
       department: cards[0]?.department || "Faculty of Engineering",
       departmentTh: cards[0]?.departmentTh || "คณะวิศวกรรมศาสตร์",
       email: cards[0]?.email || "",
       phone: cards[0]?.phone || "",
       websiteUrl: cards[0]?.websiteUrl || "",
-      address: cards[0]?.address || "Pathum Thani, Thailand",
-      addressTh: cards[0]?.addressTh || "จ.ปทุมธานี ประเทศไทย",
+      address: cards[0]?.address || "Bangkok, Thailand",
+      addressTh: cards[0]?.addressTh || "กรุงเทพมหานคร ประเทศไทย",
       avatarUrl: cards[0]?.avatarUrl || "",
       logoUrl: cards[0]?.logoUrl || "",
       linkedinUrl: cards[0]?.linkedinUrl || "",
@@ -527,7 +527,7 @@ export const NamecardManager: React.FC<NamecardManagerProps> = ({ onNotify }) =>
                       setEditingCard({ ...editingCard, fullName: e.target.value })
                     }
                     className={styles.input}
-                    placeholder="Dr. Pichate K."
+                    placeholder="User Name หรือชื่อภาษาอังกฤษ"
                   />
                 </div>
 
@@ -675,7 +675,7 @@ export const NamecardManager: React.FC<NamecardManagerProps> = ({ onNotify }) =>
                       setEditingCard({ ...editingCard, email: e.target.value })
                     }
                     className={styles.input}
-                    placeholder="pichate.k@rmutt.ac.th"
+                    placeholder="user@example.com"
                   />
                 </div>
 
@@ -688,7 +688,7 @@ export const NamecardManager: React.FC<NamecardManagerProps> = ({ onNotify }) =>
                       setEditingCard({ ...editingCard, phone: e.target.value })
                     }
                     className={styles.input}
-                    placeholder="+66 (0) 2-549-3400"
+                    placeholder="+66 (0) 2-000-0000"
                   />
                 </div>
               </div>
@@ -703,7 +703,7 @@ export const NamecardManager: React.FC<NamecardManagerProps> = ({ onNotify }) =>
                       setEditingCard({ ...editingCard, websiteUrl: e.target.value })
                     }
                     className={styles.input}
-                    placeholder="https://pichatek.com"
+                    placeholder="https://example.com"
                   />
                 </div>
 

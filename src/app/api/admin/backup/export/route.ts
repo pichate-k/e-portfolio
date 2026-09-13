@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
 
     const backupPayload = {
       version: "1.0",
-      system: "PichateK-Portfolio",
+      system: "Portfolio-CV",
       exportedAt: new Date().toISOString(),
       summary: {
         hasProfile: Boolean(profile),
@@ -54,7 +54,7 @@ export async function GET(req: NextRequest) {
     };
 
     const dateStr = new Date().toISOString().split("T")[0];
-    const filename = `pichatek-portfolio-backup-${dateStr}.json`;
+    const filename = `portfolio-backup-${dateStr}.json`;
 
     return new Response(JSON.stringify(backupPayload, null, 2), {
       status: 200,

@@ -21,7 +21,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
   if (!activity) {
     return {
-      title: "Activity Gallery | Dr. Pichate K.",
+      title: "Activity Gallery | User Portfolio",
     };
   }
 

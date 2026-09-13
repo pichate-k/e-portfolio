@@ -1,452 +1,298 @@
-# Dr. Pichate K. - Personal Site, Portfolio & CV Management System
+# 🎓 Academic & Professional Portfolio & CV Management System
 
-A production-ready, dual-language (TH-EN) personal portfolio, CV management system, and digital business card platform built with **Next.js 14 (App Router)**, **TypeScript**, **PostgreSQL**, and **Prisma ORM**.
-
----
-
-## 🔐 Important Access Credentials & Default Metadata
-
-### Default Authentication Credentials
-| Resource | Access URL | Default Username / Email | Default Password | Notes |
-|---|---|---|---|---|
-| **Admin Portal** | `/admin/login` | `pichate_k@rmutt.ac.th` | `password@pk` | Protected by HTTP-only JWT session cookie. Can be changed in Admin Dashboard. |
-| **CV Download Key** | Public Download Modal | *Any visitor* | `pichate2025` | Required to extract CV in PDF or DOCX format. Can be updated/disabled in Admin. |
-| **Local PostgreSQL** | `localhost:5432` | `postgres` | `postgres` | Default local database: `pichatek_db` |
-
-### Key Metadata & System Constants
-- **Framework**: Next.js 14.2 (App Router, Server Components & Route Handlers)
-- **Database**: PostgreSQL with Prisma ORM
-- **Color Palette**: Luxury Orange Theme (Dark Mode: `#0c0a09` / Light Mode: `#fffcf9`, Primary Accent: `#ea580c` / `#f97316`)
-- **Dual Language**: English (EN) & Thai (TH) with simultaneous bilingual input blocks
-- **Uploads Handling**:
-  - Endpoint: `/api/upload` (multipart/form-data)
-  - Storage Location: `public/uploads/`
-  - Allowed File Types: JPEG (`.jpg`, `.jpeg`), PNG (`.png`), WebP (`.webp`), GIF (`.gif`), SVG (`.svg`)
-  - Max Upload Size: 5MB
-- **Digital E-Card**: `/card` or `/ecard` with dynamic NFC business card UI, live SVG QR Code, and 1-click vCard (`.vcf`) download
+ระบบบริหารจัดการประวัติผลงานวิชาการ (Academic Portfolio), เรซูเม่/ซีวี (CV Management System), นามบัตรดิจิทัล (Digital E-Card) และแกลเลอรีภาพกิจกรรม รองรับ 2 ภาษา (**ไทย - อังกฤษ**) พัฒนาด้วย **Next.js 14**, **TypeScript**, **PostgreSQL** และ **Prisma ORM**
 
 ---
 
-## ✨ Features Overview
-
-1. **Bilingual Personal Information Management (TH-EN)**:
-   - Full Name, Current Position, Workplace / Institutional Affiliation, Current Address.
-   - Contact info: Email, Phone, Personal Website, LinkedIn, GitHub.
-   - Profile Avatar image upload with live circular preview.
-   - Executive summary and research vision in both English and Thai.
-
-2. **Dynamic CV Sections & Entries**:
-   - **Pre-configured Sections**:
-     1. Educational Background
-     2. Work Experience
-     3. Areas of Expertise
-     4. Academic Publications and Achievements
-     5. Other Relevant Experience
-     6. Training and Professional Development History
-     7. Project Management Experience
-   - **Custom Sections**: Create, reorder, show/hide, or delete custom sections.
-   - **Content Entries**: Add, edit, delete, and reorder items with titles, dates, institutions, roles, tags, external links, and descriptions.
-   - **Hyperlink Insertion**: Integrated "🔗 Insert Link" helper for both English and Thai descriptions, automatically parsed into styled, secure clickable links (`target="_blank"`).
-   - **Certificate & Attachment Upload**: Upload proof images (certificates, awards, degrees) with an interactive, full-screen **Lightbox Modal** preview.
-
-3. **Password-Protected CV Exports**:
-   - **PDF Export**: Vector-formatted academic CV with header styling, embedded avatar image, and categorized sections.
-   - **DOCX Export**: Clean Microsoft Word document with embedded avatar photo, structured tables, and typography.
-   - **Access Gate**: Requires the CV access password before download commences.
-
-4. **Digital E-Card (`/card` & `/ecard`)**:
-   - Mobile-first digital business card with ambient orange glow and NFC indicator.
-   - One-click `.vcf` vCard contact download formatted with UTF-8 for Thai and English.
-   - Scannable QR code for instant mobile sharing.
-
-5. **Notion & Lark Project Management Spec**:
-   - Architectural plan and database schema for upcoming project management extensions archived in [`docs/PROJECT_MANAGEMENT_SPEC.md`](./docs/PROJECT_MANAGEMENT_SPEC.md).
+## 📑 สารบัญ (Table of Contents)
+1. [จุดเด่นและฟังก์ชันหลักของระบบ](#-จุดเด่นและฟังก์ชันหลักของระบบ)
+2. [คู่มือการติดตั้งขึ้น Vercel สำหรับมือใหม่ (ละเอียดทีละขั้นตอน)](#-คู่มือการติดตั้งขึ้น-vercel-สำหรับมือใหม่-step-by-step)
+3. [การตั้งค่าระบบและเข้าใช้งานครั้งแรก (First-Time Setup)](#-การตั้งค่าระบบและเข้าใช้งานครั้งแรก-first-time-setup)
+4. [คู่มือการใช้งานระบบอย่างละเอียด (ครบทุกฟังก์ชัน)](#-คู่มือการใช้งานระบบอย่างละเอียด-ครบทุกฟังก์ชัน)
+   - [4.1 หน้าพอร์ตโฟลิโอสาธารณะ (Public Portfolio)](#41-หน้าพอร์ตโฟลิโอสาธารณะ-public-portfolio)
+   - [4.2 นามบัตรดิจิทัลอัจฉริยะ (Digital E-Card)](#42-นามบัตรดิจิทัลอัจฉริยะ-digital-e-card)
+   - [4.3 แกลเลอรีภาพกิจกรรมวิชาการ (Activity Gallery)](#43-แกลเลอรีภาพกิจกรรมวิชาการ-activity-gallery)
+   - [4.4 แผงควบคุมผู้ดูแลระบบ (Admin Dashboard)](#44-แผงควบคุมผู้ดูแลระบบ-admin-dashboard)
+   - [4.5 การสำรองและกู้คืนข้อมูล (Backup & Restore)](#45-การสำรองและกู้คืนข้อมูล-backup--restore)
+5. [การตั้งค่าระบบจัดเก็บไฟล์ถาวรด้วย Google Drive (แนะนำ)](#-การตั้งค่าระบบจัดเก็บไฟล์ถาวรด้วย-google-drive-แนะนำ)
+6. [การรันระบบบนเครื่องคอมพิวเตอร์ของคุณ (Local Development)](#-การรันระบบบนเครื่องคอมพิวเตอร์ของคุณ-local-development)
 
 ---
 
-## 🛠️ Local Development Setup
+## ✨ จุดเด่นและฟังก์ชันหลักของระบบ
 
-### 1. Prerequisites
-- **Node.js**: v18.17+ or v20+ LTS
-- **PostgreSQL**: v14+ running locally
-- **npm** or **pnpm**
+- 🌐 **รองรับ 2 ภาษาเต็มรูปแบบ (Dual-Language TH-EN)**: แสดงผลและกรอกข้อมูลภาษาไทยและภาษาอังกฤษคู่ขนานกัน สลับภาษาได้ทันทีโดยไม่ต้องโหลดหน้าเว็บใหม่
+- 🎨 **ดีไซน์ระดับพรีเมียม (Luxury Theme)**: โทนสีทองดำคลาสสิก รองรับทั้ง **Dark Mode** และ **Light Mode** พร้อมแอนิเมชันที่ลื่นไหล
+- 🔒 **ระบบความปลอดภัยสูง (Zero-Backdoor & First-Time Setup)**: ไม่มีรหัสผ่านฮาร์ดโค้ดค้างในระบบ ผู้ใช้เป็นผู้กำหนด Email และ Password ของตนเองตั้งแต่ครั้งแรกที่ติดตั้ง
+- 📄 **ส่งออก CV ได้ทั้ง PDF และ Word (DOCX)**: สร้างเอกสารเรซูเม่/ซีวีทางการ พร้อมระบบล็อกรหัสผ่านก่อนดาวน์โหลด (CV Access Protection)
+- 🪪 **นามบัตรดิจิทัล E-Card**: พลิกดูหน้า-หลังได้ มี QR Code สำหรับสแกน และปุ่มบันทึกเบอร์/ผู้ติดต่อลงมือถือได้ในคลิกเดียว (vCard `.vcf`)
+- 📸 **แกลเลอรีภาพกิจกรรม (Gallery)**: สร้างอัลบั้มภาพงานประชุม สัมมนา และเวิร์กช็อป เชื่อมต่อ Google Drive เพื่อดึงภาพมาแสดงอัตโนมัติ
+- 💾 **ระบบสำรองข้อมูล (JSON Backup & Restore)**: ดาวน์โหลดข้อมูลทั้งหมดเก็บไว้เป็นไฟล์ `.json` และนำกลับมา Restore ได้ทุกเมื่อ
 
-### 2. Environment Setup
-Create a `.env` file in the root directory:
+---
+
+## 🚀 คู่มือการติดตั้งขึ้น Vercel สำหรับมือใหม่ (Step-by-Step)
+
+> [!TIP]
+> **แม้คุณจะไม่เคยเขียนเว็บหรือแตะโค้ดมาก่อน ก็สามารถติดตั้งระบบนี้ได้ในเวลาไม่เกิน 5-10 นาที** โดยไม่ต้องเสียค่าใช้จ่ายใดๆ (ใช้งานฟรีทั้งบน GitHub, Neon และ Vercel)
+
+สิ่งที่ต้องเตรียมล่วงหน้า (สมัครฟรีทั้งหมด):
+1. บัญชี **[GitHub](https://github.com/)**
+2. บัญชี **[Vercel](https://vercel.com/)** (สามารถกดล็อกอินด้วย GitHub ได้เลย)
+3. บัญชี **[Neon.tech](https://neon.tech/)** (บริการฐานข้อมูล PostgreSQL ฟรี)
+
+---
+
+### ขั้นตอนที่ 1: สร้างฐานข้อมูล Cloud Database ฟรีที่ Neon.tech
+
+เนื่องจาก Vercel เป็นระบบ Serverless (ไม่มีฮาร์ดดิสก์เก็บฐานข้อมูลในตัว) จึงต้องสร้างฐานข้อมูล PostgreSQL ไว้บน Cloud ก่อน:
+
+1. เข้าเว็บไซต์ **[Neon.tech](https://neon.tech/)** แล้วกด **Sign Up** (ล็อกอินด้วยบัญชี GitHub หรือ Google)
+2. กดปุ่ม **Create Project**
+3. ตั้งชื่อโปรเจกต์ (เช่น `my-portfolio-db`) เลือก Region ใกล้ไทย เช่น **Singapore (ap-southeast-1)** แล้วกด **Create Project**
+4. เมื่อสร้างเสร็จ หน้าจอจะแสดงกล่อง **Connection Details** ให้มองหาแถวที่เขียนว่า **`Connection string`** หรือ **`DATABASE_URL`**
+5. ตรวจสอบให้แน่ใจว่าเลือกโหมดเป็น **Pooled connection** หรือรูปแบบปกติ จะได้ URL หน้าตาประมาณนี้:
+   ```text
+   postgresql://username:password@ep-xxxxxxxx.ap-southeast-1.neon.tech/neondb?sslmode=require
+   ```
+6. **กดปุ่ม Copy คัดลอก URL นี้เก็บไว้ใน Notepad** (เราจะต้องใช้ในขั้นตอนที่ 3)
+
+---
+
+### ขั้นตอนที่ 2: นำโค้ดโปรเจกต์เข้าสู่ GitHub ของคุณ
+
+1. ตรวจสอบให้แน่ใจว่าคุณได้นำโปรเจกต์นี้ขึ้น GitHub Repository ของคุณเรียบร้อยแล้ว
+2. ตรวจสอบว่าใน Repository มีไฟล์และโฟลเดอร์หลัก เช่น `package.json`, `src/`, `prisma/` อยู่ครบถ้วน
+
+---
+
+### ขั้นตอนที่ 3: สั่ง Deploy ขึ้น Vercel
+
+1. เข้าเว็บไซต์ **[Vercel.com](https://vercel.com/)** แล้วเข้าสู่ระบบ
+2. ที่หน้าหลัก (Dashboard) คลิกปุ่ม **Add New...** (มุมขวาบน) แล้วเลือก **Project**
+3. ในส่วน **Import Git Repository** ให้ค้นหาและคลิกปุ่ม **Import** ที่ชื่อคลังโปรเจกต์ GitHub ของคุณ
+4. ในหน้าตั้งค่าโปรเจกต์ (Configure Project):
+   - **Framework Preset**: ระบบจะเลือกเป็น `Next.js` ให้อัตโนมัติ (ไม่ต้องแก้ไข)
+   - **Root Directory**: ให้เป็น `./` (ค่าเริ่มต้น ไม่ต้องแก้ไข)
+5. เลื่อนลงมาที่หัวข้อ **Environment Variables** (สำคัญที่สุด):
+   ให้กดเพิ่มตัวแปรทีละตัวดังนี้:
+
+   | Key (ชื่อตัวแปร) | Value (ค่าที่ต้องใส่) | คำอธิบาย |
+   |---|---|---|
+   | **`DATABASE_URL`** | วาง Connection String ที่คัดลอกมาจาก Neon ในขั้นตอนที่ 1 | เพื่อเชื่อมต่อกับฐานข้อมูล Cloud |
+   | **`JWT_SECRET`** | พิมพ์ข้อความสุ่มยาวๆ เช่น `my_secret_key_portfolio_2025_secure_xyz` | กุญแจความปลอดภัยสำหรับระบบ Admin |
+
+   *(เมื่อพิมพ์ชื่อและค่าเสร็จ ให้กดปุ่ม **Add** ในแต่ละแถว)*
+
+6. เมื่อเพิ่มตัวแปรครบแล้ว ให้คลิกปุ่ม **Deploy** สีฟ้าด้านล่างสุด
+7. รอระบบทำการติดตั้งและบิวด์ประมาณ 1 - 2 นาที (ระบบจะสร้างตารางฐานข้อมูลทั้งหมดให้อัตโนมัติในขั้นตอนนี้)
+8. เมื่อขึ้นหน้าจอพลุฉลอง 🎉 **Congratulations!** แปลว่าเว็บไซต์ของคุณออนไลน์เรียบร้อยแล้ว! 
+9. คลิกที่รูปพรีวิวหน้าเว็บ หรือคลิกลิงก์โดเมน (เช่น `https://your-project.vercel.app`) เพื่อเปิดเว็บไซต์จริง
+
+---
+
+## 🔑 การตั้งค่าระบบและเข้าใช้งานครั้งแรก (First-Time Setup)
+
+เมื่อคุณเปิดเว็บไซต์ขึ้นมาครั้งแรก ฐานข้อมูลจะยังไม่มีบัญชีผู้ดูแลระบบ (Admin) เพื่อความปลอดภัยสูงสุด ระบบจะมีขั้นตอนตั้งค่าดังนี้:
+
+```mermaid
+flowchart LR
+    A[เปิดเข้าเว็บครั้งแรก] --> B[เข้าเมนู Admin หรือพิมพ์ /admin]
+    B --> C{ตรวจพบว่ายังไม่มี Admin}
+    C -->|อัตโนมัติ| D[ไปที่หน้า /admin/setup]
+    D --> E[กรอกชื่อ, Email, Password]
+    E --> F[กดบันทึกและเข้าสู่ Dashboard ทันที]
+    F --> G[ระบบปิดกั้นหน้า Setup ถาวร]
+```
+
+1. ไปที่แถบ URL ของเบราว์เซอร์ แล้วพิมพ์ต่อท้ายโดเมนของคุณด้วย:
+   ```text
+   https://your-domain.vercel.app/admin/setup
+   ```
+   *(หรือเข้าหน้า `/admin/login` จะมีปุ่มสีส้มแจ้งเตือนให้นำทางมาหน้านี้)*
+2. กรอกข้อมูลในฟอร์มตั้งค่า:
+   - **Administrator Name**: ชื่อของคุณ (เช่น `Dr. Pichate K.` หรือ `สมชาย ใจดี`)
+   - **Admin Email**: อีเมลที่คุณต้องการใช้เข้าสู่ระบบผู้ดูแล
+   - **Admin Password**: รหัสผ่านที่คุณต้องการใช้ล็อกอิน (ขั้นต่ำ 6 ตัวอักษร)
+   - **Confirm Password**: พิมพ์รหัสผ่านเดิมอีกครั้งเพื่อยืนยัน
+   - **CV Download Key**: กำหนดรหัสผ่านสำหรับคนทั่วไปที่จะใช้ดาวน์โหลด CV (เช่น `download123` หรือรหัสที่คุณต้องการ)
+3. กดปุ่ม **"ยืนยันและเปิดใช้งานระบบ Admin"**
+4. ระบบจะบันทึกข้อมูลและนำคุณเข้าสู่หน้า **Admin Dashboard** ทันที พร้อมสำหรับการปรับแต่งข้อมูลของคุณครับ!
+
+> [!IMPORTANT]
+> เมื่อตั้งค่า Admin เสร็จแล้ว หน้านี้จะถูกปิดใช้งานถาวร (ไม่มีใครสามารถเข้ามาตั้งค่าทับได้อีก) หากต้องการเปลี่ยนรหัสผ่านในอนาคต สามารถทำได้ผ่านหน้า Admin Dashboard -> Settings
+
+---
+
+## 📖 คู่มือการใช้งานระบบอย่างละเอียด (ครบทุกฟังก์ชัน)
+
+---
+
+### 4.1 หน้าพอร์ตโฟลิโอสาธารณะ (Public Portfolio)
+
+หน้าแรกของเว็บไซต์ (`/`) ได้รับการออกแบบให้แสดงผลข้อมูลวิชาการและประวัติการทำงานอย่างเป็นมืออาชีพ:
+
+- **การสลับภาษา (Language Switcher)**:
+  - คลิกปุ่ม **`EN | TH`** ที่แถบเมนูด้านบน (Navbar) เพื่อสลับภาษาระหว่างภาษาอังกฤษและภาษาไทยได้ทันที
+- **การเปลี่ยนธีม (Theme Toggle)**:
+  - คลิกไอคอน ☀️ หรือ 🌙 เพื่อสลับระหว่าง **Dark Mode** (พื้นหลังดำพรีเมียม) และ **Light Mode** (พื้นหลังขาวสบายตา)
+- **การดาวน์โหลด CV (Download CV Modal)**:
+  1. คลิกปุ่ม **"Download CV"** ที่แถบเมนู หรือในส่วน Hero Section
+  2. เลือกว่าต้องการดาวน์โหลดรูปแบบใด:
+     - **PDF Document**: ไฟล์เอกสารความละเอียดสูง จัดเลย์เอาต์ทางการ เหมาะสำหรับพิมพ์หรือส่งสมัครงาน
+     - **Word (DOCX)**: ไฟล์ Microsoft Word ที่นำไปแก้ไขต่อได้
+  3. เลือกภาษาของเอกสารที่ต้องการ (EN หรือ TH)
+  4. หากเปิดระบบความปลอดภัยไว้ ให้กรอก **CV Access Password** (รหัสผ่านเริ่มต้นคือรหัสที่คุณตั้งไว้ หรือดูได้จากเจ้าของประวัติ)
+  5. กดปุ่ม **"Download"** ระบบจะสร้างไฟล์และดาวน์โหลดลงเครื่องทันที
+- **ระบบดูรูปภาพและเกียรติบัตร (Lightbox Modal)**:
+  - ในรายการผลงานที่มีรูปภาพหรือใบประกาศนียบัตรแนบอยู่ สามารถคลิกที่รูปภาพเพื่อเปิดดูภาพขนาดเต็ม (Full-screen Lightbox) พร้อมปุ่มขยายและปิดได้อย่างสะดวก
+
+---
+
+### 4.2 นามบัตรดิจิทัลอัจฉริยะ (Digital E-Card)
+
+สามารถเข้าถึงได้ผ่าน URL: `/card` หรือ `/ecard` เหมาะสำหรับการเปิดบนสมาร์ตโฟนเพื่อแลกเปลี่ยนข้อมูลติดต่อ:
+
+- **การพลิกดูนามบัตร (Flip Card Animation)**:
+  - แตะที่ตัวนามบัตรเพื่อพลิกระหว่าง **ด้านหน้า** (ชื่อ, ตำแหน่ง, องค์กร, ช่องทางติดต่อ) และ **ด้านหลัง** (สโลแกน, QR Code, สัญลักษณ์ NFC)
+- **ปุ่มบันทึกข้อมูลติดต่อ (Save Contact / vCard)**:
+  - กดปุ่ม **"Save Contact"** ระบบจะดาวน์โหลดไฟล์ Contact Card (`.vcf`) ซึ่งสามารถกดเปิดบน iPhone (iOS) หรือ Android เพื่อบันทึกชื่อ เบอร์โทร อีเมล และเว็บไซต์ลงในสมุดโทรศัพท์ได้ทันที
+- **การสแกน QR Code**:
+  - ด้านหลังนามบัตรมี QR Code ความละเอียดสูง สามารถยื่นให้ผู้อื่นใช้กล้องมือถือสแกนเพื่อเปิดหน้านามบัตรของคุณได้ทันที
+- **การแชร์ลิงก์ (Share E-Card)**:
+  - กดปุ่ม **"Share"** เพื่อคัดลอกลิงก์นามบัตร หรือเปิดเมนูแชร์ของระบบมือถือ
+
+---
+
+### 4.3 แกลเลอรีภาพกิจกรรมวิชาการ (Activity Gallery)
+
+สามารถเข้าถึงได้ผ่าน URL: `/gallery` เพื่อรวบรวมภาพถ่ายงานประชุมวิชาการ, บรรยายพิเศษ, การจัดอบรม และงานนิทรรศการ:
+
+- **หน้ารวมอัลบั้มกิจกรรม (`/gallery`)**:
+  - แสดงการ์ดกิจกรรมทั้งหมด เรียงตามวันที่จัดงาน พร้อมป้ายหมวดหมู่ (เช่น Workshop, Conference, Keynote)
+- **หน้ารายละเอียดอัลบั้ม (`/gallery/[slug]`)**:
+  - เมื่อคลิกเข้ากิจกรรม จะแสดงชื่องาน วันที่ สถานที่จัดงาน และคำอธิบาย
+  - รูปภาพในอัลบั้มจะถูกโหลดมาแสดงผลอย่างเป็นระเบียบ และสามารถคลิกดูภาพขยายขนาดใหญ่ได้
+
+---
+
+### 4.4 แผงควบคุมผู้ดูแลระบบ (Admin Dashboard)
+
+เข้าสู่ระบบผ่าน URL: `/admin/login` เมื่อล็อกอินผ่านแล้วจะพบกับแผงควบคุมที่แบ่งออกเป็นแท็บต่างๆ ดังนี้:
+
+#### 1. แท็บ "Personal Info" (ข้อมูลส่วนตัว)
+- จัดการข้อมูลพื้นฐาน: ชื่อ-นามสกุล, ตำแหน่งปัจจุบัน, สังกัด/หน่วยงาน, ที่อยู่
+- ข้อมูลช่องทางการติดต่อ: Email, เบอร์โทรศัพท์, Website, LinkedIn, GitHub, Google Scholar, LINE ID
+- **รูปภาพโปรไฟล์ (Avatar Upload)**: คลิกอัปโหลดรูปภาพใบหน้าของคุณ ระบบจะแสดงตัวอย่างภาพวงกลมแบบ Real-time
+- บทสรุปประวัติย่อ (Executive Bio): กรอกคำแนะนำตัวและเป้าหมายงานวิจัย ทั้งภาษาไทยและภาษาอังกฤษ
+
+#### 2. แท็บ "CV Sections & Items" (หมวดหมู่และประวัติผลงาน)
+- **การจัดการหมวดหมู่ (Sections)**:
+  - สามารถเพิ่มหมวดหมู่ใหม่, เปลี่ยนชื่อหมวดหมู่ (TH-EN), เปลี่ยนไอคอนประจำหมวดหมู่
+  - ลากหรือคลิกปุ่มลูกศรขึ้น-ลง เพื่อสลับลำดับการแสดงผลหน้าเว็บ
+  - เปิด/ปิดการซ่อนหมวดหมู่ได้ตามต้องการ
+- **การจัดการรายการข้อมูล (Items)**:
+  - ภายในแต่ละหมวดหมู่ กดปุ่ม **"+ Add Entry"** เพื่อเพิ่มรายการ
+  - กรอกชื่อตำแหน่ง/ปริญญา, สถาบัน/องค์กร, สถานที่, ช่วงเวลาที่ทำ (หรือเลือก "ปัจจุบัน")
+  - **ตัวช่วยใส่ลิงก์ (🔗 Insert Link)**: ไฮไลต์คำที่ต้องการแล้วกดปุ่มใส่ลิงก์ ระบบจะแปลงเป็นข้อความคลิกได้ให้อัตโนมัติ
+  - **อัปโหลดภาพหลักฐาน/เกียรติบัตร**: อัปโหลดรูปใบประกาศนียบัตรเพื่อนำไปแสดงผลในหน้าเว็บสาธารณะ
+
+#### 3. แท็บ "Digital Cards" (นามบัตรดิจิทัล)
+- สร้างและจัดการนามบัตรได้หลายใบ (เช่น การ์ดสำหรับงานวิชาการ, การ์ดสำหรับงานที่ปรึกษาธุรกิจ)
+- เลือกลักษณะเทมเพลต (Executive, Academic, Modern, Cyber, Emerald)
+- ปรับแต่งสีพื้นหลัง (Background Color), สีตัวอักษร, และสี Accent
+- กำหนดให้การ์ดใบใดใบหนึ่งเป็น **Default Card** (แสดงเป็นใบแรกเมื่อมีคนเข้าชม `/card`)
+
+#### 4. แท็บ "Activity Gallery" (กิจกรรมและโฟลเดอร์ภาพ)
+- เพิ่มกิจกรรมใหม่ ระบุชื่องาน วันที่ สถานที่จัดงาน
+- ใส่ **Google Drive Folder ID** หรือวางลิงก์โฟลเดอร์ Google Drive เพื่อให้ระบบดึงรูปภาพจากโฟลเดอร์นั้นมาแสดงผลอัตโนมัติ
+
+#### 5. แท็บ "Settings" (ตั้งค่าระบบและความปลอดภัย)
+- **Site Title & Tagline**: เปลี่ยนหัวข้อของเว็บไซต์ที่แสดงในหน้าเบราว์เซอร์
+- **CV Access Password**: เปิด/ปิดการล็อกรหัสผ่านดาวน์โหลด CV หรือเปลี่ยนรหัสผ่านสำหรับดาวน์โหลด
+- **Admin Password**: เปลี่ยนรหัสผ่านเข้าสู่ระบบผู้ดูแลระบบ
+- **Google Drive Storage Settings**: ใส่ Service Account เพื่อเปิดใช้งานระบบอัปโหลดไฟล์ลง Google Drive ถาวร
+
+---
+
+### 4.5 การสำรองและกู้คืนข้อมูล (Backup & Restore)
+
+อยู่ในหน้า Admin Dashboard -> แท็บ **"Backup & Migration"**:
+
+- **การดาวน์โหลดข้อมูลสำรอง (Export Backup)**:
+  - คลิกปุ่ม **"Export System Backup (JSON)"**
+  - ระบบจะรวมข้อมูลทั้งหมดในฐานข้อมูล (Profile, ทุกหมวดหมู่ CV, นามบัตร, ข้อมูลกิจกรรม, การตั้งค่า) ดาวน์โหลดเป็นไฟล์ `.json` ไฟล์เดียวเก็บไว้ในคอมพิวเตอร์ของคุณ
+- **การกู้คืนข้อมูล (Import / Restore)**:
+  - ในกรณีที่ย้ายเซิร์ฟเวอร์หรือสร้างฐานข้อมูลใหม่ ให้เปิดหน้านี้แล้วเลือกไฟล์ `.json` ที่เคยสำรองไว้
+  - กดปุ่ม **"Restore Backup"** ข้อมูลทั้งหมดจะกลับคืนมาทันที 100%
+
+---
+
+## ☁️ การตั้งค่าระบบจัดเก็บไฟล์ถาวรด้วย Google Drive (แนะนำ)
+
+> [!NOTE]
+> บน Vercel Serverless ระบบไฟล์ในเครื่องจะเป็นแบบชั่วคราว (Ephemeral) หากต้องการให้อัปโหลดรูปภาพขนาดใหญ่และเก็บภาพเกียรติบัตรได้อย่างถาวรโดยไม่เปลืองพื้นที่ฐานข้อมูล ขอแนะนำให้เชื่อมต่อกับ Google Drive (ใช้งานฟรี 15GB ของ Google):
+
+1. ไปที่ **[Google Cloud Console](https://console.cloud.google.com/)** สร้างโปรเจกต์ใหม่
+2. เปิดใช้งาน **Google Drive API**
+3. ไปที่เมนู **Credentials** -> คลิก **Create Credentials** -> เลือก **Service Account**
+4. เข้าไปที่ Service Account ที่สร้างขึ้น ไปที่แท็บ **Keys** -> คลิก **Add Key** -> เลือก **JSON** (ดาวน์โหลดไฟล์กุญแจเก็บไว้)
+5. สร้างโฟลเดอร์ใน Google Drive ของคุณ (เช่น ตั้งชื่อว่า `Portfolio-Uploads`)
+6. กดแชร์โฟลเดอร์นั้น โดยใส่อีเมลของ **Service Account** (ลงท้ายด้วย `@...iam.gserviceaccount.com`) และให้สิทธิ์เป็น **Editor (ผู้แก้ไข)**
+7. เปิดหน้า **Admin Dashboard -> Settings -> Google Drive Settings**:
+   - ติ๊กถูกที่ **"เปิดใช้งาน Google Drive Storage"**
+   - ใส่ **Folder ID** (ดูจากลิงก์โฟลเดอร์ Google Drive เช่น `drive.google.com/drive/folders/1ABCxyz...` ให้นำเฉพาะรหัส `1ABCxyz...` มาวาง)
+   - คัดลอก `client_email` และ `private_key` จากไฟล์ JSON ที่ดาวน์โหลดมาใส่ในช่อง
+8. กดบันทึกการตั้งค่า หลังจากนี้ไฟล์รูปภาพทั้งหมดจะถูกอัปโหลดขึ้น Google Drive โดยตรงโดยอัตโนมัติ!
+
+---
+
+## 💻 การรันระบบบนเครื่องคอมพิวเตอร์ของคุณ (Local Development)
+
+หากคุณเป็นนักพัฒนาและต้องการรันโค้ดบนเครื่องของคุณเอง:
+
+### 1. ติดตั้ง Dependencies
+```bash
+npm install
+```
+
+### 2. กำหนดไฟล์ Environment Variables
+สร้างไฟล์ `.env` ที่โฟลเดอร์รากของโปรเจกต์:
 ```env
-# PostgreSQL Connection URL
-DATABASE_URL="postgresql://postgres:postgres@localhost:5432/pichatek_db?schema=public"
-
-# Secret key for Admin JWT authentication (Use a 32+ char secure random string)
-JWT_SECRET="pichatek_super_secure_jwt_secret_key_2025"
-
-# Public App Base URL
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/portfolio_db?schema=public"
+JWT_SECRET="your_custom_development_secret_32_characters_long"
 NEXT_PUBLIC_APP_URL="http://localhost:3000"
 ```
 
-### 3. Install & Seed
+### 3. เตรียมฐานข้อมูลและสร้างตาราง
 ```bash
-# Install dependencies
-npm install
+# Push schema ไปยังฐานข้อมูล
+npm run db:push
 
-# Push database schema
-npx prisma db push
-
-# Seed initial admin account, default profile, sections, and site settings
+# (ทางเลือก) ใส่ชุดข้อมูลตัวอย่างเริ่มต้น
 npm run db:seed
 ```
 
-### 4. Run Locally
+### 4. รัน Dev Server
 ```bash
 npm run dev
 ```
-Open [http://localhost:3000](http://localhost:3000) for the public site, [http://localhost:3000/admin](http://localhost:3000/admin) for the admin portal, and [http://localhost:3000/card](http://localhost:3000/card) for the E-Card.
+เปิดเบราว์เซอร์ไปที่ `http://localhost:3000`
 
 ---
 
-## ☁️ Step-by-Step Deployment: Vercel
+## 🛠️ รายการคำสั่ง Script สำคัญในโปรเจกต์
 
-Vercel is the native platform for Next.js. Because Vercel functions are serverless, follow these steps:
-
-### Step 1: Set Up a Hosted PostgreSQL Database
-Choose a managed cloud PostgreSQL provider with connection pooling:
-- **[Neon Serverless Postgres](https://neon.tech/)** (Recommended — generous free tier, built-in connection pooler)
-- **[Supabase](https://supabase.com/)**
-- **[Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres)**
-
-Copy your **Pooled Connection String** (format: `postgresql://user:password@ep-xyz-pooler.region.neon.tech/neondb?sslmode=require`).
-
-### Step 2: Push Your Code to GitHub
-```bash
-git add .
-git commit -m "feat: complete personal portfolio and CV management site"
-git push origin main
-```
-
-### Step 3: Import Project into Vercel
-1. Log in to [Vercel Dashboard](https://vercel.com/).
-2. Click **"Add New..."** > **"Project"**.
-3. Select your GitHub repository (`PichateK-site`).
-4. Framework Preset will automatically detect **Next.js**.
-
-### Step 4: Configure Environment Variables in Vercel
-Under the **Environment Variables** section, add:
-| Variable Name | Value / Description |
+| คำสั่ง | หน้าที่การทำงาน |
 |---|---|
-| `DATABASE_URL` | Your Cloud PostgreSQL Pooled connection string |
-| `DIRECT_URL` | *(Optional for Neon/Supabase)* Direct connection string for Prisma migrations |
-| `JWT_SECRET` | A secure random string (e.g. `openssl rand -base64 32`) |
-| `NEXT_PUBLIC_APP_URL` | Your production Vercel domain (e.g. `https://pichatek.vercel.app`) |
-
-> [!NOTE]
-> `package.json` already contains `"postinstall": "prisma generate"`. Vercel will automatically generate the Prisma Client on each deployment build.
-
-### Step 5: Seed the Production Database (One-time)
-From your local terminal, temporarily point to the production database and run the seed script:
-```bash
-# In your local project directory:
-DATABASE_URL="postgresql://<user>:<password>@<neon-host>/neondb?sslmode=require" npx prisma db push
-DATABASE_URL="postgresql://<user>:<password>@<neon-host>/neondb?sslmode=require" npm run db:seed
-```
-
-### Step 6: Deploy & Verify
-Click **Deploy** in Vercel. Once finished:
-1. Visit `https://your-app.vercel.app/`
-2. Log in at `https://your-app.vercel.app/admin/login` using `admin@pichatek.com` / `admin123456`.
-3. Test downloading the CV with password `pichate2025`.
+| `npm run dev` | รันเซิร์ฟเวอร์จำลองในโหมดพัฒนา (Development Mode ที่พอร์ต 3000) |
+| `npm run build` | ตรวจสอบประเภทข้อมูล (TypeScript) และคอมไพล์โปรเจกต์สำหรับขึ้น Production |
+| `npm run start` | รันโปรเจกต์ Production หลังจากการบิวด์เสร็จสิ้น |
+| `npm run db:push` | อัปเดตโครงสร้าง Schema ของ Prisma เข้าสู่ฐานข้อมูล PostgreSQL |
+| `npm run db:seed` | นำเข้าชุดข้อมูลตัวอย่างเริ่มต้นเข้าสู่ฐานข้อมูล |
 
 ---
 
-## 🐧 Step-by-Step Deployment: Ubuntu Linux (VPS / Cloud VM)
+## 📄 ลิขสิทธิ์และการใช้งาน (License)
 
-This guide covers deploying on **Ubuntu 22.04 LTS or 24.04 LTS** (DigitalOcean Droplet, AWS EC2, Linode, Hetzner, or bare-metal server) using **Node.js**, **PostgreSQL**, **PM2**, **Nginx reverse proxy**, and **Let's Encrypt SSL**.
-
----
-
-### Step 1: System Update & Essential Tools
-Connect to your Ubuntu server via SSH:
-```bash
-ssh root@your_server_ip
-```
-Update packages and install basic utilities:
-```bash
-sudo apt update && sudo apt upgrade -y
-sudo apt install -y curl git ufw build-essential
-```
-
----
-
-### Step 2: Install Node.js 20 LTS
-Install Node.js 20 using the official NodeSource repository:
-```bash
-curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
-sudo apt install -y nodejs
-
-# Verify versions
-node -v # Should be v20.x.x
-npm -v  # Should be v10.x.x
-```
-
----
-
-### Step 3: Install & Configure PostgreSQL
-```bash
-sudo apt install -y postgresql postgresql-contrib
-
-# Start and enable PostgreSQL service
-sudo systemctl start postgresql
-sudo systemctl enable postgresql
-
-# Switch to the postgres user and launch psql
-sudo -u postgres psql
-```
-
-Inside the `psql` shell, create the database user and database:
-```sql
--- Create database user with a strong password
-CREATE USER pichate_user WITH PASSWORD 'YourStrongDbPassword123!';
-
--- Create database
-CREATE DATABASE pichatek_db OWNER pichate_user;
-
--- Grant privileges
-GRANT ALL PRIVILEGES ON DATABASE pichatek_db TO pichate_user;
-
--- Exit psql
-\q
-```
-
----
-
-### Step 4: Clone the Project Repository
-Create a directory for web applications:
-```bash
-sudo mkdir -p /var/www/pichatek-site
-sudo chown -R $USER:$USER /var/www/pichatek-site
-
-# Clone repository
-git clone https://github.com/PichateK/PichateK-site.git /var/www/pichatek-site
-cd /var/www/pichatek-site
-```
-
----
-
-### Step 5: Configure Environment Variables
-Create the production `.env` file:
-```bash
-nano .env
-```
-Paste the following configuration (replace with your actual server IP or domain and DB password):
-```env
-# Database Connection
-DATABASE_URL="postgresql://pichate_user:YourStrongDbPassword123!@localhost:5432/pichatek_db?schema=public"
-
-# Admin JWT Secret (Generate a unique 32+ char key)
-JWT_SECRET="generate_a_very_long_secure_random_string_here"
-
-# Domain URL
-NEXT_PUBLIC_APP_URL="https://yourdomain.com"
-```
-Save and close nano (`Ctrl + O`, `Enter`, `Ctrl + X`).
-
----
-
-### Step 6: Install Dependencies, Migrate Database & Build
-```bash
-cd /var/www/pichatek-site
-
-# Install project dependencies
-npm install
-
-# Push Prisma schema to PostgreSQL
-npx prisma db push
-
-# Seed initial data (Admin user, default profile, sections)
-npm run db:seed
-
-# Ensure upload directory exists and has proper write permissions
-mkdir -p public/uploads
-chmod 775 public/uploads
-
-# Build the Next.js production bundle
-npm run build
-```
-
----
-
-### Step 7: Manage Application with PM2
-Install PM2 globally to keep your Next.js application running indefinitely and restart on boot:
-```bash
-sudo npm install -g pm2
-
-# Start Next.js with PM2
-pm2 start npm --name "pichatek-site" -- start
-
-# Save PM2 process list
-pm2 save
-
-# Setup PM2 startup script on system boot
-pm2 startup
-# (Run the command PM2 prints on your screen, if prompted)
-```
-
-Useful PM2 commands:
-```bash
-pm2 status                  # Check app status
-pm2 logs pichatek-site      # View live application logs
-pm2 restart pichatek-site   # Restart application
-```
-
----
-
-### Step 8: Configure Nginx as Reverse Proxy
-Install Nginx:
-```bash
-sudo apt install -y nginx
-```
-Create an Nginx configuration file for your site:
-```bash
-sudo nano /etc/nginx/sites-available/pichatek-site
-```
-Paste the following configuration (replace `yourdomain.com` with your actual domain or server IP):
-```nginx
-server {
-    listen 80;
-    server_name yourdomain.com www.yourdomain.com;
-
-    # Increase maximum allowed upload size for certificate and avatar images (e.g. 10MB)
-    client_max_body_size 10M;
-
-    location / {
-        proxy_pass http://127.0.0.1:3000;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection 'upgrade';
-        proxy_set_header Host $host;
-        proxy_cache_bypass $http_upgrade;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto $scheme;
-    }
-
-    # Cache static Next.js assets
-    location /_next/static/ {
-        proxy_pass http://127.0.0.1:3000;
-        proxy_cache_bypass $http_upgrade;
-        expires 365d;
-        access_log off;
-    }
-
-    # Serve user uploads efficiently
-    location /uploads/ {
-        alias /var/www/pichatek-site/public/uploads/;
-        expires 30d;
-        access_log off;
-    }
-}
-```
-Enable the site and verify Nginx syntax:
-```bash
-# Enable site
-sudo ln -s /etc/nginx/sites-available/pichatek-site /etc/nginx/sites-enabled/
-
-# Remove default site if present
-sudo rm -f /etc/nginx/sites-enabled/default
-
-# Test configuration
-sudo nginx -t
-
-# Reload Nginx
-sudo systemctl reload nginx
-```
-
----
-
-### Step 9: Configure Firewall (UFW)
-```bash
-sudo ufw allow OpenSSH
-sudo ufw allow 'Nginx Full'
-sudo ufw enable
-```
-
----
-
-### Step 10: Secure with Free SSL Certificate (Certbot / Let's Encrypt)
-If you have a domain pointing to your server IP:
-```bash
-sudo apt install -y certbot python3-certbot-nginx
-
-# Obtain and configure SSL certificate automatically
-sudo certbot --nginx -d yourdomain.com -d www.yourdomain.com
-```
-Follow the interactive prompts. Certbot will configure SSL renewal automatically via cron.
-
----
-
-## 🔄 Routine Maintenance & Updates (Ubuntu)
-
-To update your application when you push new code to GitHub:
-```bash
-cd /var/www/pichatek-site
-git pull origin main
-npm install
-npx prisma db push
-npm run build
-pm2 restart pichatek-site
-```
-
-### PostgreSQL Database Backup
-To back up your PostgreSQL database to a `.sql` dump:
-```bash
-pg_dump -U pichate_user -d pichatek_db -F c -b -v -f /var/www/pichatek_backup_$(date +%Y%m%d).dump
-```
-
-To restore:
-```bash
-pg_restore -U pichate_user -d pichatek_db -v /var/www/pichatek_backup_YYYYMMDD.dump
-```
-
----
-
-## 📁 Project Structure
-
-```
-├── prisma/
-│   ├── schema.prisma          # Database schema (Admin, Profile, CvSection, CvItem, SiteSetting)
-│   └── seed.ts                # Database seeding script with bilingual dummy data
-├── public/
-│   └── uploads/               # Stored user avatars and certificate images
-├── src/
-│   ├── app/
-│   │   ├── admin/             # Admin portal (Tabs: Profile, Sections, Entries, Security)
-│   │   ├── api/
-│   │   │   ├── admin/         # REST endpoints for profile, sections, items, settings
-│   │   │   ├── auth/          # Login, logout, session verification (/me)
-│   │   │   ├── card/vcf/      # vCard generation (.vcf file download)
-│   │   │   ├── cv/export/     # Password-gated PDF and DOCX generation
-│   │   │   └── upload/        # Multipart file upload handler (JPEG, PNG, WebP, SVG)
-│   │   ├── card/              # Digital E-Card NFC networking interface
-│   │   ├── page.tsx           # Public homepage server component
-│   │   └── layout.tsx         # Root HTML layout, font setup, theme provider
-│   ├── components/
-│   │   ├── Hero.tsx           # Hero intro with avatar, bio, quick contacts
-│   │   ├── SectionCard.tsx    # Section entries, tags, rich-text links, certificate lightbox
-│   │   ├── CvDownloadModal.tsx# Password modal for PDF/DOCX downloads
-│   │   └── Navbar.tsx         # Responsive navigation & language switcher (EN/TH)
-│   └── lib/
-│       ├── auth.ts            # JWT cookie issuance and verification
-│       ├── i18n.ts            # Thai and English dictionary translations
-│       ├── prisma.ts          # Singleton PrismaClient instance
-│       ├── renderRichText.tsx # Markdown link and URL parser for item descriptions
-│       └── export/
-│           ├── pdf.ts         # jsPDF document generator with embedded avatar
-│           ├── docx.ts        # docx file generator with embedded avatar
-│           └── imageHelper.ts # Universal image buffer loader and MIME detector
-└── docs/
-    └── PROJECT_MANAGEMENT_SPEC.md # Notion/Lark project management system spec
-```
-
----
-
-## 📄 License
-This project is open-source and available under the [MIT License](LICENSE).
+โปรเจกต์นี้เปิดให้ใช้งานและพัฒนาต่อยอดได้ภายใต้มาตรฐานสิทธิ์การใช้งานส่วนบุคคลและองค์กรทางการศึกษา (Open for personal & academic usage).

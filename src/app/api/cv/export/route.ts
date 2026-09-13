@@ -82,7 +82,7 @@ export async function POST(req: Request) {
       },
     });
 
-    const rawName = isTh && profile.fullNameTh ? profile.fullNameTh : profile.fullName || "Pichate_K";
+    const rawName = isTh && profile.fullNameTh ? profile.fullNameTh : profile.fullName || "Portfolio_User";
     const safeName = rawName
       .replace(/[^a-zA-Z0-9_\u0E00-\u0E7F-]/g, "_")
       .replace(/_+/g, "_");

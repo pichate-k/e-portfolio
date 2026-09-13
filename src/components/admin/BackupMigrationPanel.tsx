@@ -110,7 +110,7 @@ export const BackupMigrationPanel: React.FC<BackupMigrationPanelProps> = ({
       const link = document.createElement("a");
       const dateStr = new Date().toISOString().split("T")[0];
       link.href = url;
-      link.download = `pichatek-portfolio-backup-${dateStr}.json`;
+      link.download = `portfolio-backup-${dateStr}.json`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

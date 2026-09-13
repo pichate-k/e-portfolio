@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ShieldCheck, Lock, Mail, ArrowLeft, Loader2, AlertCircle } from "lucide-react";
+import { ShieldCheck, Lock, Mail, ArrowLeft, Loader2, AlertCircle, Sparkles, UserPlus } from "lucide-react";
 import styles from "./login.module.css";
 
 export default function AdminLoginPage() {
@@ -12,6 +12,25 @@ export default function AdminLoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [needsSetup, setNeedsSetup] = useState(false);
+
+  useEffect(() => {
+    // Check if initial setup is needed
+    const checkSetup = async () => {
+      try {
+        const res = await fetch("/api/admin/setup");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.needsSetup) {
+            setNeedsSetup(true);
+          }
+        }
+      } catch (e) {
+        console.warn("Could not check setup state:", e);
+      }
+    };
+    checkSetup();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,7 +47,10 @@ export default function AdminLoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Invalid login credentials.");
+        if (data.needsSetup) {
+          setNeedsSetup(true);
+        }
+        setError(data.error || "อีเมลหรือรหัสผ่านไม่ถูกต้อง");
         setLoading(false);
         return;
       }
@@ -37,7 +59,7 @@ export default function AdminLoginPage() {
       router.push("/admin");
       router.refresh();
     } catch {
-      setError("Network error. Please try again.");
+      setError("เกิดข้อผิดพลาดในการเชื่อมต่อเครือข่าย กรุณาลองใหม่อีกครั้ง");
       setLoading(false);
     }
   };
@@ -62,6 +84,67 @@ export default function AdminLoginPage() {
           </p>
         </div>
 
+        {needsSetup && (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "0.75rem",
+              padding: "1rem",
+              borderRadius: "var(--radius-md)",
+              background: "var(--primary-subtle)",
+              border: "1px solid var(--primary-border)",
+              marginBottom: "1.5rem",
+              textAlign: "center",
+            }}
+          >
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "0.4rem",
+                color: "var(--primary)",
+                fontWeight: 600,
+                fontSize: "0.9rem",
+              }}
+            >
+              <Sparkles size={16} />
+              <span>ตรวจพบการเข้าใช้งานครั้งแรก</span>
+            </div>
+            <p
+              style={{
+                fontSize: "0.82rem",
+                color: "var(--text-secondary)",
+                margin: 0,
+                lineHeight: 1.4,
+              }}
+            >
+              ระบบยังไม่มีบัญชีผู้ดูแลระบบ (Admin) กรุณากำหนด Email และ Password ของท่าน
+            </p>
+            <Link
+              href="/admin/setup"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "0.4rem",
+                padding: "0.6rem 1rem",
+                borderRadius: "var(--radius-sm)",
+                background: "var(--primary)",
+                color: "#ffffff",
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                textDecoration: "none",
+                boxShadow: "0 2px 8px var(--primary-glow)",
+              }}
+            >
+              <UserPlus size={15} />
+              <span>ไปที่หน้าตั้งค่า Admin ครั้งแรก</span>
+            </Link>
+          </div>
+        )}
+
         {error && (
           <div className={styles.errorAlert}>
             <AlertCircle size={18} />
@@ -82,7 +165,7 @@ export default function AdminLoginPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="pichate_k@rmutt.ac.th"
+                placeholder="admin@example.com หรืออีเมลของคุณ"
                 className={styles.input}
               />
             </div>

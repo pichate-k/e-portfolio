@@ -7,38 +7,26 @@ async function main() {
   console.log("Seeding dual language database...");
 
   // 1. Admin Users
-  const pkPasswordHash = await bcrypt.hash("password@pk", 10);
+  const userPasswordHash = await bcrypt.hash("password123", 10);
   await prisma.user.upsert({
-    where: { email: "pichate_k@rmutt.ac.th" },
-    update: { passwordHash: pkPasswordHash },
+    where: { email: "user@example.com" },
+    update: { passwordHash: userPasswordHash },
     create: {
-      email: "pichate_k@rmutt.ac.th",
-      name: "Dr. Pichate K.",
-      passwordHash: pkPasswordHash,
-      role: "ADMIN",
-    },
-  });
-
-  const adminPasswordHash = await bcrypt.hash("admin123456", 10);
-  await prisma.user.upsert({
-    where: { email: "admin@pichatek.com" },
-    update: {},
-    create: {
-      email: "admin@pichatek.com",
-      name: "Dr. Pichate K.",
-      passwordHash: adminPasswordHash,
+      email: "user@example.com",
+      name: "User Portfolio",
+      passwordHash: userPasswordHash,
       role: "ADMIN",
     },
   });
 
   // 2. Site Setting & CV Download Password
-  const downloadPasswordHash = await bcrypt.hash("pichate2025", 10);
+  const downloadPasswordHash = await bcrypt.hash("download123", 10);
   const existingSetting = await prisma.siteSetting.findFirst();
   if (!existingSetting) {
     await prisma.siteSetting.create({
       data: {
-        siteTitle: "Dr. Pichate K. | Academic & Professional Portfolio",
-        bioTagline: "Assistant Professor, AI Researcher & Engineering Educator",
+        siteTitle: "Academic & Professional Portfolio",
+        bioTagline: "Researcher, Educator & Software Engineer",
         downloadPasswordHash,
         requireCvPassword: true,
         themePreference: "system",
@@ -49,22 +37,22 @@ async function main() {
   // 3. Profile Information (Dual Language TH-EN)
   const existingProfile = await prisma.profile.findFirst();
   const profileData = {
-    fullName: "Dr. Pichate K.",
-    fullNameTh: "ดร. พิเชษฐ์ เค.",
-    currentPosition: "Assistant Professor & Lead AI Researcher",
-    currentPositionTh: "ผู้ช่วยศาสตราจารย์ และหัวหน้าทีมนักวิจัย AI",
-    workplace: "Faculty of Engineering, Rajamangala University of Technology Thanyaburi",
-    workplaceTh: "คณะวิศวกรรมศาสตร์ มหาวิทยาลัยเทคโนโลยีราชมงคลธัญบุรี",
-    address: "39 Moo 1, Klong 6, Khlong Luang, Pathum Thani 12110, Thailand",
-    addressTh: "39 หมู่ 1 ต.คลองหก อ.คลองหลวง จ.ปทุมธานี 12110 ประเทศไทย",
-    email: "pichate.k@rmutt.ac.th",
-    phone: "+66 (0) 2-549-3400",
-    websiteUrl: "https://pichatek.com",
-    linkedinUrl: "https://linkedin.com/in/pichatek",
-    githubUrl: "https://github.com/pichatek",
+    fullName: "User Name",
+    fullNameTh: "ผู้ใช้งานระบบ",
+    currentPosition: "Researcher & Software Engineer",
+    currentPositionTh: "นักวิจัยและวิศวกรซอฟต์แวร์",
+    workplace: "Faculty of Engineering, University",
+    workplaceTh: "คณะวิศวกรรมศาสตร์ มหาวิทยาลัย",
+    address: "Bangkok, Thailand",
+    addressTh: "กรุงเทพมหานคร ประเทศไทย",
+    email: "user@example.com",
+    phone: "+66 (0) 2-000-0000",
+    websiteUrl: "https://example.com",
+    linkedinUrl: "https://linkedin.com",
+    githubUrl: "https://github.com",
     avatarUrl: "",
-    bio: "Academic researcher and engineering educator specializing in Machine Learning, Intelligent Systems, and IoT Automation. Dedicated to bridging cutting-edge scientific innovation with high-impact real-world engineering solutions.",
-    bioTh: "นักวิจัยและอาจารย์ผู้เชี่ยวชาญด้านระบบการเรียนรู้ของเครื่อง (Machine Learning) ระบบอัจฉริยะ และระบบอัตโนมัติ IoT มุ่งเน้นการเชื่อมโยงนวัตกรรมทางวิทยาการคอมพิวเตอร์ชั้นนำเข้ากับงานวิศวกรรมที่สร้างผลกระทบเชิงบวกต่อสังคมและอุตสาหกรรมจริง",
+    bio: "Academic researcher and software engineer dedicated to scientific innovation and high-impact engineering solutions.",
+    bioTh: "นักวิจัยและวิศวกรซอฟต์แวร์ มุ่งเน้นการพัฒนานวัตกรรมทางวิทยาการคอมพิวเตอร์และงานวิศวกรรมที่สร้างผลกระทบเชิงบวก",
   };
 
   if (existingProfile) {
