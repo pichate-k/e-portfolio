@@ -1,0 +1,181 @@
+// Prisma schema file for PichateK-site
+// Supports PostgreSQL on local and Vercel cloud (Neon, Supabase, etc.)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  name         String
+  role         String   @default("ADMIN")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model SiteSetting {
+  id                   String   @id @default(cuid())
+  siteTitle            String   @default("Pichate K. | Academic & Professional Portfolio")
+  bioTagline           String?  @default("Researcher, Educator & Professional Engineer")
+  downloadPasswordHash String   // Hashed download password
+  requireCvPassword    Boolean  @default(true)
+  themePreference      String   @default("system")
+  exportSettings       String?  @default("{}")
+  googleDriveSettings  String?  @default("{}")
+  updatedAt            DateTime @updatedAt
+}
+
+model Profile {
+  id                String   @id @default(cuid())
+  fullName          String   @default("Dr. Pichate K.")
+  fullNameTh        String?  @default("ดร. พิเชษฐ์ เค.")
+  currentPosition   String   @default("Assistant Professor & Lead AI Researcher")
+  currentPositionTh String?  @default("ผู้ช่วยศาสตราจารย์ และหัวหน้าทีมนักวิจัย AI")
+  workplace         String   @default("Faculty of Engineering, Rajamangala University of Technology Thanyaburi")
+  workplaceTh       String?  @default("คณะวิศวกรรมศาสตร์ มหาวิทยาลัยเทคโนโลยีราชมงคลธัญบุรี")
+  address           String   @default("Pathum Thani, Thailand")
+  addressTh         String?  @default("จ.ปทุมธานี ประเทศไทย")
+  email             String   @default("pichate.k@rmutt.ac.th")
+  phone             String?  @default("+66 (0) 2-549-3400")
+  websiteUrl        String?
+  linkedinUrl       String?
+  githubUrl         String?
+  googleScholarUrl  String?
+  avatarUrl         String?
+  bio               String?
+  bioTh             String?
+  updatedAt         DateTime @updatedAt
+}
+
+model CvSection {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String
+  titleTh       String?
+  description   String?
+  descriptionTh String?
+  orderIndex    Int      @default(0)
+  isSystem      Boolean  @default(false)
+  isVisible     Boolean  @default(true)
+  icon          String?
+  contentType   String?  @default("text")
+  customFields  String?  @default("[]")
+  exportConfig  String?  @default("{}")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  items         CvItem[]
+
+  @@index([orderIndex])
+}
+
+model CvItem {
+  id             String    @id @default(cuid())
+  sectionId      String
+  section        CvSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+  title          String
+  titleTh        String?
+  subtitle       String?
+  subtitleTh     String?
+  organization   String?
+  organizationTh String?
+  location       String?
+  locationTh     String?
+  startDate      String?
+  endDate        String?
+  isCurrent      Boolean   @default(false)
+  description    String?
+  descriptionTh  String?
+  url            String?
+  imageUrl       String?
+  customData     String?   @default("{}")
+  tags           String?
+  orderIndex     Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([sectionId, orderIndex])
+}
+
+model Namecard {
+  id              String   @id @default(cuid())
+  slug            String   @unique
+  title           String   // e.g. "Academic Card", "AI Consultant"
+  template        String   @default("executive") // executive, academic, modern, cyber, emerald
+  isDefault       Boolean  @default(false)
+  
+  // Front details (Dual language support)
+  fullName        String
+  fullNameTh      String?
+  position        String
+  positionTh      String?
+  organization    String?
+  organizationTh  String?
+  department      String?
+  departmentTh    String?
+  email           String?
+  phone           String?
+  websiteUrl      String?
+  address         String?
+  addressTh       String?
+  avatarUrl       String?
+  logoUrl         String?
+  
+  // Social / Links
+  linkedinUrl     String?
+  githubUrl       String?
+  googleScholarUrl String?
+  lineId          String?
+  
+  // Bio / Personal Details
+  bio             String?
+  bioTh           String?
+  
+  // Back details
+  backTagline     String?
+  backTaglineTh   String?
+  backSubtitle    String?
+  qrType          String   @default("card_url") // "card_url" | "vcf" | "custom"
+  customQrUrl     String?
+  
+  // Customization & Styles
+  primaryColor    String?  @default("#ea580c")
+  accentColor     String?  @default("#f97316")
+  backgroundColor String?  @default("#0f172a")
+  textColor       String?  @default("#ffffff")
+  cardStyleJson   String?  @default("{}")
+  
+  orderIndex      Int      @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([orderIndex])
+}
+
+model GalleryActivity {
+  id            String   @id @default(cuid())
+  slug          String   @unique
+  title         String   // e.g. "AI & Embedded Systems Workshop 2025"
+  titleTh       String?  // e.g. "การประชุมเชิงปฏิบัติการระบบ AI และสมองกลฝังตัว 2568"
+  description   String?
+  descriptionTh String?
+  eventDate     String   // e.g. "15-18 มกราคม 2568" or "January 15-18, 2025"
+  location      String?  // e.g. "BITEC Bangna, Bangkok"
+  locationTh    String?  // e.g. "ศูนย์นิทรรศการและการประชุมไบเทค บางนา"
+  category      String?  @default("Workshop") // Workshop, Conference, Research, Exhibition, Keynote
+  coverImageUrl String?  // Optional custom cover image URL or Drive thumbnail
+  driveFolderId String   // Google Drive Folder ID or URL
+  photoCount    Int?     @default(0)
+  isVisible     Boolean  @default(true)
+  orderIndex    Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([orderIndex, eventDate])
+}

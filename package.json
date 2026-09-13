@@ -1,0 +1,37 @@
+{
+  "name": "pichatek-site",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "node -e \"if(process.env.DATABASE_URL){try{require('child_process').execSync('npx prisma db push --accept-data-loss',{stdio:'inherit'})}catch(e){console.warn('Prisma push warning:',e.message)}}\" && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "postinstall": "prisma generate",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^2.4.3",
+    "docx": "^9.0.3",
+    "html-to-image": "^1.11.13",
+    "jose": "^5.9.6",
+    "jspdf": "^2.5.2",
+    "lucide-react": "^0.468.0",
+    "next": "^14.2.21",
+    "qrcode": "^1.5.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.17.10",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "prisma": "^5.22.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}
