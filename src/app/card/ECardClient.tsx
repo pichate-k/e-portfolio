@@ -355,6 +355,10 @@ export const ECardClient: React.FC<ECardClientProps> = ({
               <span>{isTh ? "แชร์นามบัตรดิจิทัลนี้" : "Share This E-Card"}</span>
             </button>
           </div>
+
+          <div style={{ textAlign: "center", marginTop: "2rem", fontSize: "0.75rem", color: "var(--text-muted)", opacity: 0.8 }}>
+            This site created by kunatechnology Co.,LTD.
+          </div>
         </div>
       </div>
 

@@ -51,19 +51,12 @@ export const Footer: React.FC<FooterProps> = ({
           <p style={{ fontSize: "0.8rem", marginTop: "0.5rem" }}>
             © {new Date().getFullYear()} {t.rightsReserved}
           </p>
+          <p style={{ fontSize: "0.8rem", marginTop: "0.35rem", color: "var(--text-muted)" }}>
+            This site created by kunatechnology Co.,LTD.
+          </p>
         </div>
 
         <div style={{ display: "flex", alignItems: "center", gap: "1.5rem" }}>
-          <span
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "0.3rem",
-              fontSize: "0.82rem",
-            }}
-          >
-            {/* {t.builtWith} <Heart size={14} color="#ef4444" fill="#ef4444" /> */}
-          </span>
 
           <Link
             href="/admin"

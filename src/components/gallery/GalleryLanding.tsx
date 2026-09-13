@@ -272,6 +272,22 @@ export const GalleryLanding: React.FC<GalleryLandingProps> = ({
             })}
           </div>
         )}
+
+        <footer
+          style={{
+            borderTop: "1px solid var(--border-subtle)",
+            marginTop: "4rem",
+            padding: "2rem 0 1rem 0",
+            textAlign: "center",
+            fontSize: "0.85rem",
+            color: "var(--muted-foreground)",
+          }}
+        >
+          <p>© {new Date().getFullYear()} All rights reserved.</p>
+          <p style={{ fontSize: "0.8rem", marginTop: "0.25rem", opacity: 0.85 }}>
+            This site created by kunatechnology Co.,LTD.
+          </p>
+        </footer>
       </div>
     </div>
   );
