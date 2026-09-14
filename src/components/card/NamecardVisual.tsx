@@ -12,7 +12,7 @@ import {
   RotateCw,
   Sparkles,
 } from "lucide-react";
-import { NamecardData, CARD_TEMPLATES } from "./cardTemplates";
+import { NamecardData, CARD_TEMPLATES, parseCardTextColors } from "./cardTemplates";
 import styles from "./NamecardVisual.module.css";
 
 export interface NamecardVisualRef {
@@ -106,6 +106,8 @@ export const NamecardVisual = forwardRef<NamecardVisualRef, NamecardVisualProps>
         .catch((err) => console.error("Failed to generate QR code", err));
     }, [card.qrType, card.customQrUrl, card.slug, card.id, lang, cardBaseUrl, tmplDef.theme]);
 
+    const textColors = parseCardTextColors(card);
+
     const initials = name
       .split(" ")
       .map((w) => w[0])
@@ -123,13 +125,31 @@ export const NamecardVisual = forwardRef<NamecardVisualRef, NamecardVisualProps>
         ? styles.tmplCyber
         : card.template === "emerald"
         ? styles.tmplEmerald
+        : card.template === "rosegold"
+        ? styles.tmplRosegold
+        : card.template === "titanium"
+        ? styles.tmplTitanium
+        : card.template === "ruby"
+        ? styles.tmplRuby
+        : card.template === "champagne"
+        ? styles.tmplChampagne
+        : card.template === "amethyst"
+        ? styles.tmplAmethyst
         : styles.tmplExecutive;
 
     const styleVars = {
       "--card-primary": primaryColor,
       "--card-accent": accentColor,
       "--card-bg": bgColor,
+      ...(textColors.orgColor ? { "--card-org-color": textColors.orgColor } : {}),
+      ...(textColors.nameColor ? { "--card-name-color": textColors.nameColor } : {}),
+      ...(textColors.positionColor ? { "--card-pos-color": textColors.positionColor } : {}),
+      ...(textColors.contactColor ? { "--card-contact-color": textColors.contactColor } : {}),
+      ...(textColors.taglineColor ? { "--card-tagline-color": textColors.taglineColor } : {}),
+      ...(textColors.subtitleColor ? { "--card-subtitle-color": textColors.subtitleColor } : {}),
     } as React.CSSProperties;
+
+    const contactIconColor = textColors.contactColor || accentColor;
 
     return (
       <div className={`${styles.flipCardWrapper} ${className}`} style={styleVars}>
@@ -148,6 +168,11 @@ export const NamecardVisual = forwardRef<NamecardVisualRef, NamecardVisualProps>
             {card.template === "academic" && <div className={styles.academicBorder} />}
             {card.template === "modern" && <div className={styles.modernStripe} />}
             {card.template === "cyber" && <div className={styles.cyberGrid} />}
+            {card.template === "rosegold" && <div className={styles.rosegoldAccentLine} />}
+            {card.template === "titanium" && <div className={styles.titaniumGrid} />}
+            {card.template === "ruby" && <div className={styles.rubyBorder} />}
+            {card.template === "champagne" && <div className={styles.champagneStripe} />}
+            {card.template === "amethyst" && <div className={styles.amethystGlow} />}
 
             <div className={styles.frontContainer}>
               {/* Header: Organization & Crest / SmartChip */}
@@ -159,7 +184,9 @@ export const NamecardVisual = forwardRef<NamecardVisualRef, NamecardVisualProps>
 
                 <div className={styles.crestOrChip}>
                   {card.logoUrl ? (
-                    <img src={card.logoUrl} alt="Logo" className={styles.logoImg} />
+                    <div className={styles.logoWrapper}>
+                      <img src={card.logoUrl} alt="Logo" className={styles.logoImg} />
+                    </div>
                   ) : card.template === "cyber" ? (
                     <div className={styles.crestOrChip}>
                       <Sparkles size={20} color={accentColor} />
@@ -190,25 +217,25 @@ export const NamecardVisual = forwardRef<NamecardVisualRef, NamecardVisualProps>
               <div className={styles.frontFooter}>
                 {card.email && (
                   <div className={styles.contactItem} title={card.email}>
-                    <Mail size={12} color={accentColor} />
+                    <Mail size={12} color={contactIconColor} />
                     <span>{card.email}</span>
                   </div>
                 )}
                 {card.phone && (
                   <div className={styles.contactItem} title={card.phone}>
-                    <Phone size={12} color={accentColor} />
+                    <Phone size={12} color={contactIconColor} />
                     <span>{card.phone}</span>
                   </div>
                 )}
                 {card.websiteUrl && (
                   <div className={styles.contactItem} title={card.websiteUrl}>
-                    <Globe size={12} color={accentColor} />
+                    <Globe size={12} color={contactIconColor} />
                     <span>{card.websiteUrl.replace(/^https?:\/\//, "")}</span>
                   </div>
                 )}
                 {address && (
                   <div className={styles.contactItem} title={address}>
-                    <MapPin size={12} color={accentColor} />
+                    <MapPin size={12} color={contactIconColor} />
                     <span>{address}</span>
                   </div>
                 )}
@@ -223,23 +250,29 @@ export const NamecardVisual = forwardRef<NamecardVisualRef, NamecardVisualProps>
           >
             {card.template === "academic" && <div className={styles.academicBorder} />}
             {card.template === "cyber" && <div className={styles.cyberGrid} />}
+            {card.template === "titanium" && <div className={styles.titaniumGrid} />}
+            {card.template === "ruby" && <div className={styles.rubyBorder} />}
+            {card.template === "champagne" && <div className={styles.champagneStripe} />}
+            {card.template === "amethyst" && <div className={styles.amethystGlow} />}
 
             <div className={styles.backContainer}>
               <div className={styles.backLeft}>
-                <div className={styles.monogramCrest}>
-                  {card.logoUrl ? (
+                {card.logoUrl ? (
+                  <div className={styles.monogramCrestWithLogo}>
                     <img src={card.logoUrl} alt="Logo" className={styles.logoImg} />
-                  ) : (
+                  </div>
+                ) : (
+                  <div className={styles.monogramCrest}>
                     <span>{initials}</span>
-                  )}
-                </div>
+                  </div>
+                )}
 
                 <h3 className={styles.backTagline}>{tagline}</h3>
                 {subtitle && <p className={styles.backSubtitle}>{subtitle}</p>}
 
                 {card.websiteUrl && (
                   <div className={styles.backUrlPill}>
-                    <Globe size={11} color={accentColor} />
+                    <Globe size={11} color={textColors.subtitleColor || accentColor} />
                     <span>{card.websiteUrl.replace(/^https?:\/\//, "")}</span>
                   </div>
                 )}

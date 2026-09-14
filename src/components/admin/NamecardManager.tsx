@@ -18,14 +18,69 @@ import {
   User,
   Share2,
   Sparkles,
+  Upload,
+  Image as ImageIcon,
+  Loader2,
+  Type,
+  RotateCcw,
 } from "lucide-react";
-import { NamecardData, CARD_TEMPLATES } from "../card/cardTemplates";
+import {
+  NamecardData,
+  CARD_TEMPLATES,
+  CardTextColors,
+  parseCardTextColors,
+  encodeCardStyle,
+} from "../card/cardTemplates";
 import { NamecardVisual, NamecardVisualRef } from "../card/NamecardVisual";
 import { downloadCardImage, downloadBothSides } from "@/lib/cardExport";
 import styles from "./NamecardManager.module.css";
 
 interface NamecardManagerProps {
   onNotify?: (msg: { type: "success" | "error"; text: string }) => void;
+}
+
+// Client-side image compression helper
+async function compressImage(
+  file: File,
+  maxWidth = 700,
+  maxHeight = 700,
+  quality = 0.88
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target?.result as string;
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let width = img.width;
+        let height = img.height;
+
+        if (width > height) {
+          if (width > maxWidth) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          }
+        } else {
+          if (height > maxHeight) {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext("2d");
+        ctx?.drawImage(img, 0, 0, width, height);
+        resolve(
+          canvas.toDataURL(file.type === "image/png" ? "image/png" : "image/jpeg", quality)
+        );
+      };
+      img.onerror = (err) => reject(err);
+    };
+    reader.onerror = (err) => reject(err);
+  });
 }
 
 export const NamecardManager: React.FC<NamecardManagerProps> = ({ onNotify }) => {
@@ -37,6 +92,10 @@ export const NamecardManager: React.FC<NamecardManagerProps> = ({ onNotify }) =>
   const [activeSide, setActiveSide] = useState<"front" | "back">("front");
   const [previewLang, setPreviewLang] = useState<"en" | "th">("en");
   const [exporting, setExporting] = useState(false);
+
+  // Upload progress states
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
 
   const visualRef = useRef<NamecardVisualRef>(null);
 
@@ -95,6 +154,7 @@ export const NamecardManager: React.FC<NamecardManagerProps> = ({ onNotify }) =>
       primaryColor: defaultTemplate.defaultPrimary,
       accentColor: defaultTemplate.defaultAccent,
       backgroundColor: defaultTemplate.defaultBg,
+      textColors: {},
     };
 
     setEditingCard(newCard);
@@ -104,9 +164,67 @@ export const NamecardManager: React.FC<NamecardManagerProps> = ({ onNotify }) =>
 
   // Edit existing card
   const handleStartEdit = (card: NamecardData) => {
-    setEditingCard({ ...card });
+    setEditingCard({
+      ...card,
+      textColors: parseCardTextColors(card),
+    });
     setIsNew(false);
     setActiveSide("front");
+  };
+
+  // Image Upload Handlers
+  const handleAvatarFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editingCard) return;
+    setUploadingAvatar(true);
+    try {
+      const dataUrl = await compressImage(file, 600, 600, 0.9);
+      setEditingCard({ ...editingCard, avatarUrl: dataUrl });
+      onNotify?.({ type: "success", text: "Uploaded profile avatar photo!" });
+    } catch (err: any) {
+      onNotify?.({ type: "error", text: err.message || "Failed to process photo" });
+    } finally {
+      setUploadingAvatar(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleLogoFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !editingCard) return;
+    setUploadingLogo(true);
+    try {
+      const dataUrl = await compressImage(file, 600, 600, 0.9);
+      setEditingCard({ ...editingCard, logoUrl: dataUrl });
+      onNotify?.({ type: "success", text: "Uploaded logo/crest successfully!" });
+    } catch (err: any) {
+      onNotify?.({ type: "error", text: err.message || "Failed to process logo" });
+    } finally {
+      setUploadingLogo(false);
+      e.target.value = "";
+    }
+  };
+
+  // Text Color Handlers
+  const handleTextColorChange = (field: keyof CardTextColors, value: string) => {
+    if (!editingCard) return;
+    const updatedColors = {
+      ...editingCard.textColors,
+      [field]: value,
+    };
+    setEditingCard({
+      ...editingCard,
+      textColors: updatedColors,
+    });
+  };
+
+  const handleResetTextColors = () => {
+    if (!editingCard) return;
+    setEditingCard({
+      ...editingCard,
+      textColors: {},
+    });
+    onNotify?.({ type: "success", text: "Reset section text colors to default." });
   };
 
   // Duplicate card
@@ -183,6 +301,11 @@ export const NamecardManager: React.FC<NamecardManagerProps> = ({ onNotify }) =>
     setSaving(true);
 
     try {
+      const payload = {
+        ...editingCard,
+        cardStyleJson: encodeCardStyle(editingCard.cardStyleJson, editingCard.textColors),
+      };
+
       const url = isNew
         ? "/api/admin/namecards"
         : `/api/admin/namecards/${editingCard.id}`;
@@ -191,7 +314,7 @@ export const NamecardManager: React.FC<NamecardManagerProps> = ({ onNotify }) =>
       const res = await fetch(url, {
         method,
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editingCard),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -508,6 +631,129 @@ export const NamecardManager: React.FC<NamecardManagerProps> = ({ onNotify }) =>
                   />
                 </div>
               </div>
+
+              {/* Granular Section Text Colors Customization */}
+              <div style={{ marginTop: 12 }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: 8,
+                  }}
+                >
+                  <label
+                    className={styles.fieldLabel}
+                    style={{ display: "flex", alignItems: "center", gap: 6 }}
+                  >
+                    <Type size={14} color="var(--primary)" />
+                    <span>Section Typography & Text Colors (สีตัวอักษรแต่ละหัวข้อ)</span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleResetTextColors}
+                    className={styles.btnResetColors}
+                    title="Revert individual text colors to template defaults"
+                  >
+                    <RotateCcw size={11} style={{ marginRight: 4 }} />
+                    Reset Colors
+                  </button>
+                </div>
+
+                <div className={styles.textColorsGrid}>
+                  <div className={styles.textColorItem}>
+                    <span className={styles.textColorLabel}>
+                      Organization & Dept (ชื่อองค์กร / คณะ)
+                    </span>
+                    <input
+                      type="color"
+                      value={
+                        editingCard.textColors?.orgColor ||
+                        editingCard.primaryColor ||
+                        "#ffffff"
+                      }
+                      onChange={(e) => handleTextColorChange("orgColor", e.target.value)}
+                      className={styles.colorInput}
+                    />
+                  </div>
+
+                  <div className={styles.textColorItem}>
+                    <span className={styles.textColorLabel}>Full Name (ชื่อ-นามสกุล)</span>
+                    <input
+                      type="color"
+                      value={editingCard.textColors?.nameColor || "#ffffff"}
+                      onChange={(e) => handleTextColorChange("nameColor", e.target.value)}
+                      className={styles.colorInput}
+                    />
+                  </div>
+
+                  <div className={styles.textColorItem}>
+                    <span className={styles.textColorLabel}>Position / Role (ตำแหน่ง)</span>
+                    <input
+                      type="color"
+                      value={
+                        editingCard.textColors?.positionColor ||
+                        editingCard.accentColor ||
+                        "#d4af37"
+                      }
+                      onChange={(e) =>
+                        handleTextColorChange("positionColor", e.target.value)
+                      }
+                      className={styles.colorInput}
+                    />
+                  </div>
+
+                  <div className={styles.textColorItem}>
+                    <span className={styles.textColorLabel}>
+                      Contacts & Icons (ช่องทางติดต่อ)
+                    </span>
+                    <input
+                      type="color"
+                      value={
+                        editingCard.textColors?.contactColor ||
+                        editingCard.accentColor ||
+                        "#d4af37"
+                      }
+                      onChange={(e) =>
+                        handleTextColorChange("contactColor", e.target.value)
+                      }
+                      className={styles.colorInput}
+                    />
+                  </div>
+
+                  <div className={styles.textColorItem}>
+                    <span className={styles.textColorLabel}>
+                      Back Tagline (สโลแกนด้านหลัง)
+                    </span>
+                    <input
+                      type="color"
+                      value={editingCard.textColors?.taglineColor || "#ffffff"}
+                      onChange={(e) =>
+                        handleTextColorChange("taglineColor", e.target.value)
+                      }
+                      className={styles.colorInput}
+                    />
+                  </div>
+
+                  <div className={styles.textColorItem}>
+                    <span className={styles.textColorLabel}>
+                      Back Subtitle (หัวข้อย่อยด้านหลัง)
+                    </span>
+                    <input
+                      type="color"
+                      value={
+                        editingCard.textColors?.subtitleColor ||
+                        editingCard.accentColor ||
+                        "#d4af37"
+                      }
+                      onChange={(e) =>
+                        handleTextColorChange("subtitleColor", e.target.value)
+                      }
+                      className={styles.colorInput}
+                    />
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* 2. Personal & Professional Information (Dual Language) */}
@@ -630,8 +876,51 @@ export const NamecardManager: React.FC<NamecardManagerProps> = ({ onNotify }) =>
               </div>
 
               <div className={styles.fieldRow}>
+                {/* Profile Photo / Avatar */}
                 <div className={styles.fieldGroup}>
-                  <label className={styles.fieldLabel}>Avatar / Photo URL</label>
+                  <label className={styles.fieldLabel}>Avatar / Profile Photo</label>
+                  <div className={styles.mediaUploadBox}>
+                    <div className={styles.mediaThumbWrapper}>
+                      {editingCard.avatarUrl ? (
+                        <img
+                          src={editingCard.avatarUrl}
+                          alt="Avatar Preview"
+                          className={styles.mediaThumbImg}
+                        />
+                      ) : (
+                        <ImageIcon size={22} color="var(--muted-foreground)" />
+                      )}
+                    </div>
+
+                    <div className={styles.mediaActions}>
+                      <label className={styles.btnUploadFile}>
+                        {uploadingAvatar ? (
+                          <Loader2 size={13} className="animate-spin" />
+                        ) : (
+                          <Upload size={13} />
+                        )}
+                        <span>{uploadingAvatar ? "Processing..." : "Upload Photo"}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleAvatarFileChange}
+                          style={{ display: "none" }}
+                          disabled={uploadingAvatar}
+                        />
+                      </label>
+                      {editingCard.avatarUrl && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setEditingCard({ ...editingCard, avatarUrl: "" })
+                          }
+                          className={styles.btnRemoveMedia}
+                        >
+                          Remove Photo
+                        </button>
+                      )}
+                    </div>
+                  </div>
                   <input
                     type="text"
                     value={editingCard.avatarUrl || ""}
@@ -639,12 +928,54 @@ export const NamecardManager: React.FC<NamecardManagerProps> = ({ onNotify }) =>
                       setEditingCard({ ...editingCard, avatarUrl: e.target.value })
                     }
                     className={styles.input}
-                    placeholder="https://... or upload"
+                    placeholder="Or enter image URL: https://..."
+                    style={{ marginTop: 4, fontSize: 11 }}
                   />
                 </div>
 
+                {/* Logo / Crest */}
                 <div className={styles.fieldGroup}>
-                  <label className={styles.fieldLabel}>Logo / Crest URL (Optional)</label>
+                  <label className={styles.fieldLabel}>Logo / Institutional Crest</label>
+                  <div className={styles.mediaUploadBox}>
+                    <div className={styles.mediaThumbWrapper}>
+                      {editingCard.logoUrl ? (
+                        <img
+                          src={editingCard.logoUrl}
+                          alt="Logo Preview"
+                          className={styles.mediaThumbImg}
+                        />
+                      ) : (
+                        <Sparkles size={22} color="var(--muted-foreground)" />
+                      )}
+                    </div>
+
+                    <div className={styles.mediaActions}>
+                      <label className={styles.btnUploadFile}>
+                        {uploadingLogo ? (
+                          <Loader2 size={13} className="animate-spin" />
+                        ) : (
+                          <Upload size={13} />
+                        )}
+                        <span>{uploadingLogo ? "Processing..." : "Upload Logo"}</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleLogoFileChange}
+                          style={{ display: "none" }}
+                          disabled={uploadingLogo}
+                        />
+                      </label>
+                      {editingCard.logoUrl && (
+                        <button
+                          type="button"
+                          onClick={() => setEditingCard({ ...editingCard, logoUrl: "" })}
+                          className={styles.btnRemoveMedia}
+                        >
+                          Remove Logo
+                        </button>
+                      )}
+                    </div>
+                  </div>
                   <input
                     type="text"
                     value={editingCard.logoUrl || ""}
@@ -652,7 +983,8 @@ export const NamecardManager: React.FC<NamecardManagerProps> = ({ onNotify }) =>
                       setEditingCard({ ...editingCard, logoUrl: e.target.value })
                     }
                     className={styles.input}
-                    placeholder="Institutional Logo URL"
+                    placeholder="Or enter logo URL: https://..."
+                    style={{ marginTop: 4, fontSize: 11 }}
                   />
                 </div>
               </div>

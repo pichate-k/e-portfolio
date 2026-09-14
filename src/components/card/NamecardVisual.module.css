@@ -12,10 +12,12 @@
   aspect-ratio: 1.75 / 1; /* Standard business card 3.5 x 2 inches */
   transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
   transform-style: preserve-3d;
+  -webkit-transform-style: preserve-3d;
 }
 
 .flipped {
   transform: rotateY(180deg);
+  -webkit-transform: rotateY(180deg);
 }
 
 /* Card Faces */
@@ -27,8 +29,9 @@
   height: 100%;
   -webkit-backface-visibility: hidden;
   backface-visibility: hidden;
+  -webkit-transform-style: preserve-3d;
+  transform-style: preserve-3d;
   border-radius: 18px;
-  overflow: hidden;
   box-shadow: 
     0 20px 40px -15px rgba(0, 0, 0, 0.5),
     0 0 0 1px rgba(255, 255, 255, 0.1),
@@ -37,14 +40,49 @@
   flex-direction: column;
   box-sizing: border-box;
   user-select: none;
+  overflow: hidden;
+}
+
+/* 
+   Crucial Mobile Flip Bug Fix:
+   WebKit / iOS Safari ignores backface-visibility when overflow:hidden is present.
+   We apply translateZ(1px) and transition opacity/visibility to prevent front face bleed-through.
+*/
+.cardFront {
+  transform: rotateY(0deg) translateZ(1px);
+  -webkit-transform: rotateY(0deg) translateZ(1px);
+  opacity: 1;
+  visibility: visible;
+  z-index: 2;
+  transition: opacity 0.15s ease 0.2s, visibility 0.15s ease 0.2s;
+}
+
+.flipped .cardFront {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 1;
 }
 
 .cardBack {
-  transform: rotateY(180deg);
+  transform: rotateY(180deg) translateZ(1px);
+  -webkit-transform: rotateY(180deg) translateZ(1px);
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 1;
+  transition: opacity 0.15s ease 0.2s, visibility 0.15s ease 0.2s;
+}
+
+.flipped .cardBack {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  z-index: 2;
 }
 
 /* ==========================================================================
-   Template Variations
+   Template Variations (10 Rich Color Themes)
    ========================================================================== */
 
 /* 1. Executive Charcoal & Gold */
@@ -58,11 +96,6 @@
   height: 3px;
   background: linear-gradient(90deg, #d4af37, #fef08a, #b45309);
   width: 100%;
-}
-
-.tmplExecutive .chipBadge {
-  background: linear-gradient(135deg, #d4af37, #78350f);
-  color: #09090b;
 }
 
 /* 2. Royal Academic Navy */
@@ -123,6 +156,88 @@
   border: 1px solid rgba(16, 185, 129, 0.3);
 }
 
+/* 6. Midnight Obsidian & Rose Gold */
+.tmplRosegold {
+  background: radial-gradient(circle at 95% 10%, #2a1824 0%, #17101a 60%, #0c080e 100%);
+  color: #ffffff;
+  border: 1px solid rgba(251, 113, 133, 0.35);
+}
+
+.tmplRosegold .rosegoldAccentLine {
+  height: 3px;
+  background: linear-gradient(90deg, #fb7185, #fda4af, #f43f5e);
+  width: 100%;
+}
+
+/* 7. Titanium Slate & Electric Ice */
+.tmplTitanium {
+  background: radial-gradient(circle at 90% 10%, #1e293b 0%, #0f172a 65%, #070a12 100%);
+  color: #f1f5f9;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.tmplTitanium .titaniumGrid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(56, 189, 248, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(56, 189, 248, 0.05) 1px, transparent 1px);
+  background-size: 22px 22px;
+  pointer-events: none;
+}
+
+/* 8. Imperial Crimson & Gold */
+.tmplRuby {
+  background: radial-gradient(circle at 95% 10%, #58121a 0%, #25070b 65%, #130306 100%);
+  color: #ffffff;
+  border: 1px solid rgba(245, 158, 11, 0.4);
+}
+
+.tmplRuby .rubyBorder {
+  position: absolute;
+  inset: 9px;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  border-radius: 12px;
+  pointer-events: none;
+}
+
+/* 9. Champagne Ivory & Warm Bronze */
+.tmplChampagne {
+  background: #fffdf9;
+  color: #292524;
+  border: 1px solid #e7e5e4;
+  box-shadow: 
+    0 15px 35px -10px rgba(120, 53, 15, 0.1),
+    0 0 0 1px rgba(180, 83, 9, 0.12);
+}
+
+.tmplChampagne .champagneStripe {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: linear-gradient(180deg, #b45309, #d97706);
+}
+
+/* 10. Royal Amethyst & Platinum */
+.tmplAmethyst {
+  background: radial-gradient(circle at 90% 10%, #4c1d95 0%, #1f0b3d 60%, #0d041a 100%);
+  color: #ffffff;
+  border: 1px solid rgba(192, 132, 252, 0.35);
+}
+
+.tmplAmethyst .amethystGlow {
+  position: absolute;
+  top: -30px;
+  right: -30px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(192, 132, 252, 0.2) 0%, transparent 70%);
+  pointer-events: none;
+}
+
 /* ==========================================================================
    FRONT SIDE LAYOUT
    ========================================================================== */
@@ -132,7 +247,7 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  padding: 24px 28px;
+  padding: 22px 26px;
   z-index: 2;
 }
 
@@ -140,39 +255,45 @@
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 16px;
+  gap: 14px;
 }
 
 .orgBlock {
   flex: 1;
+  min-width: 0;
 }
 
 .orgTitle {
   font-size: 13px;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   margin: 0 0 2px 0;
   opacity: 0.95;
   line-height: 1.3;
+  color: var(--card-org-color, inherit);
+  word-break: break-word;
 }
 
 .deptTitle {
   font-size: 11px;
-  opacity: 0.75;
+  opacity: 0.8;
   margin: 0;
   font-weight: 500;
+  color: var(--card-org-color, inherit);
+  word-break: break-word;
 }
 
 .crestOrChip {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .smartChip {
-  width: 38px;
-  height: 28px;
+  width: 36px;
+  height: 26px;
   border-radius: 6px;
   background: linear-gradient(135deg, #fbbf24, #d97706);
   box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.4), 0 2px 4px rgba(0, 0, 0, 0.3);
@@ -184,29 +305,40 @@
 .smartChip::before {
   content: "";
   position: absolute;
-  inset: 5px;
+  inset: 4px;
   border: 1px solid rgba(0, 0, 0, 0.3);
   border-radius: 3px;
 }
 
+.logoWrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 80px;
+  max-height: 40px;
+}
+
 .logoImg {
-  width: 44px;
-  height: 44px;
+  max-width: 100%;
+  max-height: 40px;
+  width: auto;
+  height: auto;
   object-fit: contain;
-  border-radius: 8px;
+  border-radius: 6px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.25));
 }
 
 /* Middle Persona section */
 .personaBlock {
   display: flex;
   align-items: center;
-  gap: 18px;
+  gap: 16px;
   margin: auto 0;
 }
 
 .avatarWrapper {
-  width: 68px;
-  height: 68px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
   padding: 2.5px;
   background: linear-gradient(135deg, var(--card-primary, #d4af37), var(--card-accent, #f59e0b));
@@ -231,7 +363,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 22px;
+  font-size: 20px;
   font-weight: 800;
   letter-spacing: 1px;
 }
@@ -242,54 +374,54 @@
 }
 
 .personName {
-  font-size: 20px;
+  font-size: 19px;
   font-weight: 800;
   letter-spacing: -0.01em;
   margin: 0 0 4px 0;
   line-height: 1.2;
+  color: var(--card-name-color, inherit);
+  word-break: break-word;
 }
 
 .personPosition {
-  font-size: 13px;
+  font-size: 12.5px;
   font-weight: 600;
-  color: var(--card-accent, #d4af37);
-  margin: 0 0 4px 0;
+  color: var(--card-pos-color, var(--card-accent, #d4af37));
+  margin: 0 0 2px 0;
   line-height: 1.3;
-}
-
-.personSubRole {
-  font-size: 11px;
-  opacity: 0.7;
-  margin: 0;
+  word-break: break-word;
 }
 
 /* Front Footer Contacts */
 .frontFooter {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 6px 14px;
+  gap: 6px 12px;
   padding-top: 10px;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.tmplModern .frontFooter {
+.tmplModern .frontFooter,
+.tmplChampagne .frontFooter {
   border-top: 1px solid #e2e8f0;
 }
 
 .contactItem {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 6px;
   font-size: 10.5px;
-  opacity: 0.85;
+  opacity: 0.88;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--card-contact-color, inherit);
 }
 
 .contactItem span {
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--card-contact-color, inherit);
 }
 
 /* ==========================================================================
@@ -301,13 +433,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 28px 36px;
-  gap: 24px;
+  padding: 24px 32px;
+  gap: 20px;
   z-index: 2;
 }
 
 .backLeft {
   flex: 1;
+  min-width: 0;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -329,38 +462,65 @@
   margin-bottom: 12px;
 }
 
+.monogramCrestWithLogo {
+  width: auto;
+  max-width: 90px;
+  height: 44px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  margin-bottom: 12px;
+}
+
+.tmplModern .monogramCrestWithLogo,
+.tmplChampagne .monogramCrestWithLogo {
+  background: #f1f5f9;
+  border: 1px solid #e2e8f0;
+}
+
 .backTagline {
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 700;
   line-height: 1.35;
   margin: 0 0 6px 0;
   letter-spacing: -0.01em;
+  color: var(--card-tagline-color, inherit);
+  word-break: break-word;
 }
 
 .backSubtitle {
-  font-size: 11.5px;
-  opacity: 0.75;
-  margin: 0 0 12px 0;
-  font-weight: 500;
+  font-size: 11px;
+  opacity: 0.85;
+  margin: 0 0 10px 0;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--card-accent, #d4af37);
+  letter-spacing: 0.05em;
+  color: var(--card-subtitle-color, var(--card-accent, #d4af37));
+  word-break: break-word;
 }
 
 .backUrlPill {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 600;
   padding: 4px 12px;
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.15);
   width: fit-content;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.tmplModern .backUrlPill {
+.tmplModern .backUrlPill,
+.tmplChampagne .backUrlPill {
   background: #f1f5f9;
   border: 1px solid #e2e8f0;
   color: #0f172a;
@@ -371,14 +531,14 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 6px;
   flex-shrink: 0;
 }
 
 .qrFrame {
   background: #ffffff;
-  padding: 8px;
-  border-radius: 14px;
+  padding: 7px;
+  border-radius: 12px;
   box-shadow: 
     0 10px 25px -5px rgba(0, 0, 0, 0.4),
     0 0 0 2px var(--card-accent, #d4af37);
@@ -388,16 +548,16 @@
 }
 
 .qrImage {
-  width: 112px;
-  height: 112px;
+  width: 106px;
+  height: 106px;
   display: block;
 }
 
 .qrHint {
-  font-size: 10px;
+  font-size: 9.5px;
   font-weight: 600;
-  opacity: 0.8;
-  letter-spacing: 0.05em;
+  opacity: 0.85;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
@@ -423,6 +583,7 @@
   font-weight: 600;
   cursor: pointer;
   transition: all 0.2s ease;
+  touch-action: manipulation;
 }
 
 .flipBtn:hover {
@@ -430,7 +591,7 @@
   transform: translateY(-1px);
 }
 
-/* High-res export helper - stays hidden or offscreen when needed */
+/* High-res export helper */
 .exportCanvasTarget {
   width: 1050px;
   height: 600px;
@@ -441,6 +602,9 @@
   transform-origin: top left;
 }
 
+/* ==========================================================================
+   RESPONSIVE ENHANCEMENTS FOR MOBILE SCREENS
+   ========================================================================== */
 @media (max-width: 640px) {
   .frontContainer {
     padding: 16px 18px;
@@ -457,12 +621,13 @@
   }
   .frontFooter {
     gap: 4px 8px;
+    padding-top: 8px;
   }
   .contactItem {
     font-size: 9.5px;
   }
   .backContainer {
-    padding: 18px 20px;
+    padding: 16px 20px;
     gap: 14px;
   }
   .backTagline {
@@ -473,3 +638,98 @@
     height: 86px;
   }
 }
+
+@media (max-width: 440px) {
+  .frontContainer {
+    padding: 12px 14px;
+  }
+  .orgTitle {
+    font-size: 11px;
+    letter-spacing: 0.02em;
+  }
+  .deptTitle {
+    font-size: 9px;
+  }
+  .personaBlock {
+    gap: 10px;
+  }
+  .avatarWrapper {
+    width: 44px;
+    height: 44px;
+    padding: 2px;
+  }
+  .avatarInitials {
+    font-size: 15px;
+  }
+  .personName {
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+  .personPosition {
+    font-size: 10px;
+  }
+  .frontFooter {
+    gap: 2px 6px;
+    padding-top: 6px;
+  }
+  .contactItem {
+    font-size: 8.5px;
+    gap: 4px;
+  }
+  .smartChip {
+    width: 28px;
+    height: 20px;
+  }
+  .logoWrapper {
+    max-width: 60px;
+    max-height: 30px;
+  }
+  .logoImg {
+    max-height: 30px;
+  }
+  .backContainer {
+    padding: 12px 14px;
+    gap: 10px;
+  }
+  .monogramCrest {
+    width: 34px;
+    height: 34px;
+    font-size: 15px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+  }
+  .monogramCrestWithLogo {
+    height: 34px;
+    max-width: 70px;
+    margin-bottom: 6px;
+  }
+  .backTagline {
+    font-size: 11px;
+    line-height: 1.25;
+    margin-bottom: 3px;
+  }
+  .backSubtitle {
+    font-size: 9px;
+    margin-bottom: 6px;
+  }
+  .backUrlPill {
+    font-size: 8.5px;
+    padding: 2px 8px;
+  }
+  .qrFrame {
+    padding: 4px;
+    border-radius: 8px;
+  }
+  .qrImage {
+    width: 70px;
+    height: 70px;
+  }
+  .qrHint {
+    font-size: 8px;
+  }
+  .flipBtn {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+}
+
